@@ -1,0 +1,135 @@
+<resources>
+    <string name="app_name">STTarter</string>
+    
+    <!-- STTarter Library -->
+    <string name="menu_settings">Settings</string>
+    <string name="server">सर्वर</string>
+    <string name="port">बंदरगाह</string>
+    <string name="connect">जुडिये</string>
+
+    <string name="newConnection">नया कनेक्शन</string>
+    <string name="newConnectionShort">+</string>
+
+    <string name="title_activity_new_connection">नया कनेक्शन</string>
+    <string name="clientID">ग्राहक आईडी</string>
+    <string name="connectedto">से जुड़ा</string>
+
+    <string name="Disconnect">डिस्कनेक्ट</string>
+    <string name="subscribe">सदस्यता लें</string>
+    <string name="publish">प्रकाशित करना</string>
+    <string name="title_activity_subscribe">सदस्यता लें</string>
+    <string name="disconnected">से काट दिया</string>
+    <string name="topic">विषय</string>
+    <string name="history">इतिहास</string>
+    <string name="title_activity_history">इतिहास</string>
+    <string name="subscribed">निम्न पर सब्सक्राइब किया गया ह</string>
+    <string name="token">org.eclipse.paho.android.service.sample.ClientConnections</string>
+    <string name="no_status">करने के लिए अज्ञात कनेक्शन स्थिति</string>
+    <string name="connecting">को जोड़ रहा</string>
+    <string name="disconnecting">से डिस्कनेक्ट</string>
+    <string name="connectionError">एक त्रुटि के को जोड़ने हुई</string>
+
+    <string name="title_activity_publish">प्रकाशित करना</string>
+    <string name="message">संदेश</string>
+    <string name="qos0">0</string>
+    <string name="qos1">1</string>
+    <string name="qos2">2</string>
+    <string name="empty"></string>
+    <string name="qos">QOS</string>
+    <string name="retained">बरकरार रखा</string>
+    <string name="cleanSession">स्वच्छ सत्र</string>
+    <string name="advanced">उन्नत विकल्प</string>
+    <string name="advancedShort">उन्नत</string>
+    <string name="title_activity_advanced">उन्नत</string>
+    <string name="uname">उपयोगकर्ता नाम</string>
+    <string name="pass">पासवर्ड</string>
+    <string name="ssl">SSL</string>
+    <string name="timeout">समय समाप्त</string>
+    <string name="keepalive">जिंदा रहो  \n समय समाप्त</string>
+
+    <string name="title_activity_last_will">अंतिम विल संदेश</string>
+    <string name="setLastWill">सेट अंतिम विल संदेश</string>
+    <string name="willMessage">सेट अंतिम विल संदेश</string>
+    <string name="willMessageShort">अंतिम इच्छा</string>
+    <string name="notifyTitle">एसटीटी संदेश प्राप्त किया</string>
+    <string name="notifyTitle_connectionLost">एसटीटी ग्राहकों का कनेक्शन खो दिया है</string>
+
+    <string name="save">बचाना</string>
+    <string name="title_activity_connection_details">कनेक्शन विवरण</string>
+    <string name="startLogging">लॉगिंग करने देना</string>
+    <string name="endLogging">अक्षम लॉगिंग</string>
+    <string name="missingOptions">ग्राहकआईडी , सर्वर पता या पोर्ट नंबर याद आ रही है । सही या रद्द तीर वापस प्रेस कृपया ।</string>
+
+    <string name='dateFormat'>dd/MM/yy \'at\' HH:mm:ss</string>
+    <string name="unkown_error">Unknown Error</string>
+    <string name="delete">कनेक्शन को हटाना</string>
+    <string name="disconnectClient">डिस्कनेक्ट ग्राहक?</string>
+    <string name="deleteDialog">चयनित ग्राहक वर्तमान में जुड़ा हुआ है या जोड़ने, इस संबंध को हटाने का कारण होगा यह काट दिया ।</string>
+    <string name="continueBtn">जारी रहना</string>
+    <string name="cancelBtn">रद्द करना</string>
+
+    <!-- Strings that need formatting  -->
+    <string name="messageRecieved">प्राप्त संदेश
+ %1$s &lt;br/&gt; &lt;छोटा&gt;विषय: %2$s &lt;/छोटा&gt; </string>
+    <string name="timestamp">&lt;br/&gt; &lt;छोटा&gt; %1$s &lt;/छोटा&gt;</string>
+    <string name="notification">%1$s मिल चुका है
+ %2$s विषय पर %3$s</string>
+    <string name="toast_pub_success">प्रकाशित संदेश:%1$sविषय के लिए :
+ %2$s</string>
+    <string name="toast_sub_success">निम्न पर सब्सक्राइब किया गया है
+%1$s</string>
+    <string name="toast_disconnected">डिस्कनेक्टेड</string>
+    <string name="toast_pub_failed">संदेश को प्रकाशित करने में विफल:
+ %1$s विषय के लिए :
+ %2$s</string>
+    <string name="toast_sub_failed">की सदस्यता के लिए विफल
+ %1$s</string>
+    <string name="connection_lost">%1$s के लिए कनेक्शन खो दिया है
+ %2$s</string>
+    <string name="failure_disconnect">डिस्कनेक्ट विफल रहा है।
+&lt;br/&gt; &lt;छोटा&gt;कारण: %s&lt;/छोटा
+&gt; </string>
+    <string name="failure_connect">क्लाइंट कनेक्ट करने में विफल रहा है ।
+&lt;br/&gt; &lt;छोटा&gt;कारण: %s&lt;/छोटा&gt;</string>
+    <string name="client_connected">क्लाइंट सफलतापूर्वक जुड़ा
+</string>
+
+    <!-- Hints -->
+    <string name="serverURIHint">example.example.com</string>
+    <string name="portHint">1883</string>
+    <string name="contentDescriptionSSL">Enable SSL</string>
+    <string name="contentDescriptionCleanSession">स्वच्छ सत्र</string>
+    <string name="topicHint">नमस्ते</string>
+    <string name="messageHint">नमस्ते दुनिया</string>
+    <string name="unameHint">उपयोगकर्ता</string>
+    <string name="passwordHint">पासवर्ड</string>
+    <string name="timeoutHint">60</string>
+    <string name="keepaliveHint">200</string>
+    <string name="sslKeyLocaltion">file://</string>
+    <string name="select">चुनते हैं</string>
+    <string name="you">आप</string>
+    <string name="ellipse_text_here">यहाँ लिखो&#8230;</string>
+    <string name="user">उपयोगकर्ता</string>
+    <string name="time_stamp">10:45 PM</string>
+    <string name="header_text">शीर्ष लेख पाठ</string>
+    <string name="topic_name">विषय नाम</string>
+    <string name="sentFrom">द्वारा भेजा गया</string>
+    <string name="desc">अवरोही</string>
+    <string name="channel">चैनल</string>
+    <string name="school_football_club">स्कूल फुटबॉल क्लब</string>
+    <string name="latest_messages_of_group">समूह की नवीनतम संदेश यहाँ प्रदर्शित किया जाता है के रूप में एक दृश्य परिवर्तन के बाद ही अपडेट किया जाता है जो</string>
+
+    <string name="select_table">तालिका का चयन करें</string>
+    <string name="no_of_records">रिकॉर्ड्स की संख्या:</string>
+    <string name="submit_query">जिज्ञासा दर्ज करें</string>
+    <string name="click_to_update_or_delete">नीचे दिए गए मूल्यों को अद्यतन करने के लिए पंक्ति पर क्लिक करें या टपल नष्ट</string>
+    <string name="enter_your_query_and_enter_submit">यहाँ अपनी क्वेरी दर्ज और क्वेरी बटन जमा करें पर क्लिक करें। परिणाम के नीचे प्रदर्शित किया जाएगा</string>
+    <string name="previous">पिछला</string>
+    <string name="next">अगला</string>
+    <string name="error_messages_will_be_displayed_here">त्रुटि संदेश यहाँ प्रदर्शित किया जाएगा</string>
+    <string name="custom_query">कस्टम क्वेरी</string>
+    <string name="support">समर्थन</string>
+    <string name="custom_offers">कस्टम कार्यक्षमता व्यापार की आवश्यकताओं के अनुसार लागू किया जा सकता</string>
+    <string name="click_here_to_visit_website">यात्रा करने के लिए लुकास भारतीय सेवा वेबसाइट लिए यहाँ क्लिक करें</string>
+
+</resources>

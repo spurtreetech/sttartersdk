@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="light_orange">#fff7ec</color>
+    <color name="primary">#CC2B27</color>
+    <color name="primary_dark">#A72222</color>
+    <color name="light_time_stamp">#e0D3D3D3</color>
+    <color name="text_color_33">#333333</color>
+    <color name="text_color_72">#727272</color>
+    <color name="text_color_b6">#b6b6b6</color>
+    <color name="edit_text_top_div_color">#26000000</color>
+    <color name="butter_scotch">#ffab40</color>
+    <color name="text_color_21">#212121</color>
+    <color name="green_circle">#008000</color>
+</resources>

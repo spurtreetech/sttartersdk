@@ -1,0 +1,55 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.spurtreetech.sttarter.lib">
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <!-- <uses-permission android:name="android.permission.WAKE_LOCK" /> -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application android:allowBackup="true" android:label="@string/app_name">
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
+        <!-- <service android:name=".helper.TestService" /> -->
+
+        <!--
+        <provider
+            android:name="com.spurtreetech.sttarter.lib.helper.STTContentProvider"
+            android:authorities="com.spurtreetech.sttarter.lib.helper"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:label="STTContentProvider"
+            android:readPermission="com.spurtreetech.sttarter.lib.helper.READ"
+            android:writePermission="com.spurtreetech.sttarter.lib.helper.WRITE" /> -->
+
+        <provider
+            android:name="com.spurtreetech.sttarter.lib.provider.STTContentProvider"
+            android:authorities="com.spurtreetech.sttarter.lib.provider"
+            android:exported="false" />
+
+        <!--
+        <provider
+            android:name="com.spurtreetech.sttarter.lib.provider.STTContentProvider"
+            android:authorities="com.spurtreetech.sttarter.lib.provider"
+            android:exported="false" /> -->
+
+        <activity android:name="com.spurtreetech.sttarter.lib.helper.AndroidDatabaseManager"
+            android:theme="@style/Theme.AppCompat.Light"/>
+
+        <receiver android:name=".helper.utils.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".helper.utils.WakeUpReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+
+</manifest>
