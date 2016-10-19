@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat.Builder;
 
-import com.spurtreetech.sttarter.lib.R;
 import com.spurtreetech.sttarter.lib.helper.utils.BuildUtils;
 
 import java.util.Calendar;
@@ -68,8 +67,8 @@ public class Notify {
         .setContentText(messageString)
         .setTicker(ticker)
         .setWhen(when)
-        .setGroup("com.spurtreetech.sttarter.lib.helper")
-        .setSmallIcon(R.mipmap.autosense);
+        .setGroup("com.spurtreetech.sttarter.lib.helper");
+        //.setSmallIcon(R.mipmap.autosense);
 
     Notification notification = notificationCompat.build();
     //display the notification
