@@ -20,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 import com.spurtreetech.sttarter.lib.helper.Connection.ConnectionStatus;
 import com.spurtreetech.sttarter.lib.helper.models.LoginOTPResponse;
 import com.spurtreetech.sttarter.lib.helper.models.LoginResponse;
+import com.spurtreetech.sttarter.lib.helper.utils.NotificationHelperListener;
 import com.spurtreetech.sttarter.lib.helper.volley.LruBitmapCache;
 import com.spurtreetech.sttarter.lib.provider.STTProviderHelper;
 
@@ -66,6 +67,8 @@ public class STTarter {
      */
     private ChangeListener changeListener = new ChangeListener();
 
+    NotificationHelperListener notificationHelperListener;
+
 
     public static synchronized STTarter getInstance() {
 
@@ -103,12 +106,13 @@ public class STTarter {
      * @param applicationContext context of the Application
      * @param userToken Token of the user for Authenticating in STTarter
      */
-    public void init(String appId, String appSecret, String userID, String userToken,String app_Token, Context applicationContext) {
+    public void init(String appId, String appSecret, String userID, String userToken, String app_Token, Context applicationContext, NotificationHelperListener notificationHelperListener) {
 
         //STTarter.getInstance();
         this.context = applicationContext;
         this.appId = appId;
         this.appSecret = appSecret;
+        this.notificationHelperListener = notificationHelperListener;
 
         sp = applicationContext.getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
         spEditor = sp.edit();
@@ -137,7 +141,7 @@ public class STTarter {
         this.clientId = getClientId();
 
         try {
-            initiateConnnection();
+            initiateConnnection(notificationHelperListener);
         } catch (ContextNotInitializedException e) {
             e.printStackTrace();
         }
@@ -233,7 +237,7 @@ public class STTarter {
         Log.d("STTarter", "USER_ID - " + userId);
 
         try {
-            initiateConnnection();
+            initiateConnnection(notificationHelperListener);
         } catch (ContextNotInitializedException e) {
             e.printStackTrace();
         }
@@ -457,7 +461,7 @@ public class STTarter {
     /**
      * initialize connection to the server
      */
-    public void initiateConnnection() throws ContextNotInitializedException{
+    public void initiateConnnection(NotificationHelperListener notificationHelperListener) throws ContextNotInitializedException{
 
         if(!PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"").equals("")) {
 
@@ -488,7 +492,7 @@ public class STTarter {
             bundle.putBoolean(ActivityConstants.ssl,
                     ActivityConstants.defaultSsl);
 
-            connectAction(bundle);
+            connectAction(bundle,notificationHelperListener);
         } else {
             throw new ContextNotInitializedException("No user id specified");
         }
@@ -525,7 +529,7 @@ public class STTarter {
      *
      * @param data the {@link Bundle} returned by the inti function
      */
-    private void connectAction(Bundle data) {
+    private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
         MqttConnectOptions  conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
@@ -648,7 +652,7 @@ public class STTarter {
         }
 
         // whenever a new message arrives or connection is lost
-        client.setCallback(new STTCallbackHandler(this.context, clientHandle));
+        client.setCallback(new STTCallbackHandler(this.context, clientHandle,notificationHelperListener));
 
 
         //set traceCallback

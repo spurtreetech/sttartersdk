@@ -5,7 +5,10 @@
       <module fileurl="file://$PROJECT_DIR$/SttarterSDK.iml" filepath="$PROJECT_DIR$/SttarterSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/sttartersdk.iml" filepath="$PROJECT_DIR$/sttartersdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sttartersdk.iml" filepath="$PROJECT_DIR$/sttartersdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" filepath="$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" filepath="$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" filepath="$PROJECT_DIR$/sttartersdk_lib/sttartersdk_lib.iml" />
     </modules>

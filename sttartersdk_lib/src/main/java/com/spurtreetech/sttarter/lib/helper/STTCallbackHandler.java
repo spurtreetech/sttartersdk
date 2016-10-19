@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.spurtreetech.sttarter.lib.R;
 import com.spurtreetech.sttarter.lib.helper.models.PayloadData;
 import com.spurtreetech.sttarter.lib.helper.models.TopicMeta;
-import com.spurtreetech.sttarter.lib.helper.utils.NotificationHelper;
+import com.spurtreetech.sttarter.lib.helper.utils.NotificationHelperListener;
 import com.spurtreetech.sttarter.lib.provider.STTProviderHelper;
 import com.spurtreetech.sttarter.lib.provider.messages.MessagesCursor;
 import com.spurtreetech.sttarter.lib.provider.topics.TopicsCursor;
@@ -36,10 +36,20 @@ public class STTCallbackHandler implements MqttCallback {
      * @param clientHandle The handle to a {@link Connection} object
      */
     BroadcastHelper  broadCastHelper;
+    NotificationHelperListener notificationHelperListener;
+
     public STTCallbackHandler(Context context, String clientHandle)
     {
         this.context = context;
         this.clientHandle = clientHandle;
+        broadCastHelper = new BroadcastHelper(context);
+    }
+
+    public STTCallbackHandler(Context context, String clientHandle, NotificationHelperListener notificationHelperListener)
+    {
+        this.context = context;
+        this.clientHandle = clientHandle;
+        this.notificationHelperListener = notificationHelperListener;
         broadCastHelper = new BroadcastHelper(context);
     }
 
@@ -70,7 +80,7 @@ public class STTCallbackHandler implements MqttCallback {
             Notify.notifcation(context, message, intent, R.string.notifyTitle_connectionLost);
             // TODO try to restart connection if internet connection is available
             try {
-                STTarter.getInstance().initiateConnnection();
+                STTarter.getInstance().initiateConnnection(notificationHelperListener);
             } catch (STTarter.ContextNotInitializedException e) {
                 e.printStackTrace();
             }
@@ -205,7 +215,8 @@ public class STTCallbackHandler implements MqttCallback {
                         }
 
                         PreferenceHelper.getSharedPreferenceEditor().putString(Keys.NOTIFICATION_TOPICS, notificationString).commit();
-                        NotificationHelper.displayNotification(notificationString);
+                        this.notificationHelperListener.displayNotification(notificationString);
+                        //NotificationHelper.displayNotification(notificationString);
                     }
                 } else {
 
