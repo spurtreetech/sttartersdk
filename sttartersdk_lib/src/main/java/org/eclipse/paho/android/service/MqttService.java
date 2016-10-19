@@ -663,7 +663,7 @@ public class MqttService extends Service implements MqttTraceHandler {
                 sp.getString(Keys.APP_SECRET, ""),
                 sp.getString(Keys.USER_ID, ""),
                 sp.getString(Keys.USER_TOKEN, ""),sp.getString(Keys.AUTH_TOKEN,""),
-                getApplicationContext());
+                getApplicationContext(),null);
       }
 
     }

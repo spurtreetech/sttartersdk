@@ -94,7 +94,7 @@ public class NotificationHelper {
                     .setContentText(mainText)
                     .setContentIntent(pIntent)
                     //.addAction(android.R.drawable.stat_notify_chat, "Open", pIntent)
-                    .setSmallIcon(R.mipmap.autosense)
+                    //.setSmallIcon(R.mipmap.autosense)
                     .setCategory(Notification.CATEGORY_EVENT)
                     .setGroupSummary(true)
                     .setGroup("sttarter")
@@ -149,7 +149,7 @@ public class NotificationHelper {
                             .setSummaryText("Total unread messages")
                             .setBigContentTitle(STTarter.getInstance().getContext().getResources().getString(R.string.app_name)))
                     .setNumber(2)
-                    .setSmallIcon(R.mipmap.autosense)
+                    //.setSmallIcon(R.mipmap.autosense)
                     .setCategory(Notification.CATEGORY_EVENT)
                     .setGroupSummary(true)
                     .setGroup("sttarter");
