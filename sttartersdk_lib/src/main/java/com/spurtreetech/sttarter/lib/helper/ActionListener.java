@@ -151,7 +151,7 @@ class ActionListener implements IMqttActionListener {
     //Log.d("ActionListener", "subscribe - " + additionalArgs[0]);
     // TODO call the subscribe function with the topic name
     //String topic[] = additionalArgs[1].split(";");
-    //gr.subscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,""));
+    //gr.subscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,""));
   }
 
   /**
@@ -186,14 +186,14 @@ class ActionListener implements IMqttActionListener {
     c.addAction("Client Connected");
     Notify.toast(context, "Client Connected", Toast.LENGTH_SHORT);
 
-    //if(!PreferenceHelper.getSharedPreference().getString(Keys.ALL_TOPICS_LIST,"").equals("")) {
+    //if(!PreferenceHelper.getSharedPreference().getString(STTKeys.ALL_TOPICS_LIST,"").equals("")) {
       STTGeneralRoutines sttGeneralRoutines = new STTGeneralRoutines();
       sttGeneralRoutines.subscribeInitalize();
     //}
 
 
     /*
-    if(new PreferenceHelper().getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").equals("")) {
+    if(new PreferenceHelper().getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
       // TODO call get_topics API and subscribe to all topics and store it in shared preferences
       STTGeneralRoutines sGR = new STTGeneralRoutines();
       sGR.subscribeInitalize("345","346");
@@ -210,7 +210,7 @@ class ActionListener implements IMqttActionListener {
     //Log.d("ActionListener", "unsubscribe - " + additionalArgs[0]);
     // TODO call the unsubscribe function with the topic name
     //String topic[] = additionalArgs[1].split(";");
-    //gr.unsubscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(Keys.USER_ID, ""));
+    //gr.unsubscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
   }
 
   /**

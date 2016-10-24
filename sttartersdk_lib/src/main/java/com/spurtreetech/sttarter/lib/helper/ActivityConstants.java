@@ -50,7 +50,7 @@ public class ActivityConstants {
   /** Show History Request Code  **/
   static final int showHistory = 3;
 
-  /* Bundle Keys */
+  /* Bundle STTKeys */
 
   /** Server Bundle Key **/
   static final String server = "server";

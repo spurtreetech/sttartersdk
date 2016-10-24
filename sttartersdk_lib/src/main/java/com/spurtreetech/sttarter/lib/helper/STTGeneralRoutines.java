@@ -40,7 +40,7 @@ public class STTGeneralRoutines {
 
         // TODO unsubscribe all topics
         // get all subscribed topics
-        //String[] topics = PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").split(",");
+        //String[] topics = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").split(",");
         //STTarter.getInstance().unsubscribe(topics);
 
         // TODO get all topics from server and subscribe to all of them
@@ -60,7 +60,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.MY_TOPICS + "/" ;//+ PreferenceHelper.getSharedPreference().getString(Keys.USER_ID, "");
+        String url = STTKeys.MY_TOPICS + "/" ;//+ PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
         Log.d(TAG, "MyTopics url - " + url);
 
         GsonRequest<MyTopicsInfo> myReq = new GsonRequest<MyTopicsInfo>(
@@ -110,10 +110,10 @@ public class STTGeneralRoutines {
                     if (tempTopic.getType().contains("org")){
                         SharedPreferences sp = null;
                         try {
-                            sp = STTarter.getInstance().getContext().getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+                            sp = STTarter.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
                             SharedPreferences.Editor spEditor = sp.edit();
 
-                            spEditor.putString(Keys.BUZZ_TOPIC,tempTopic.getTopic());
+                            spEditor.putString(STTKeys.BUZZ_TOPIC,tempTopic.getTopic());
                             Log.d("Buzz_Organization",tempTopic.getTopic());
 
                             spEditor.commit();
@@ -142,8 +142,8 @@ public class STTGeneralRoutines {
                 }
 
                 // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").equals("")) {
-                PreferenceHelper.getSharedPreferenceEditor().putString(Keys.SUBSCRIBED_TOPICS, subscribedTopics);
+                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();
                 //}
 
@@ -163,7 +163,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.ALL_TOPICS;   // + "/" + PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"");
+        String url = STTKeys.ALL_TOPICS;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
         Log.d(TAG, "AllTopics url - " + url);
 
         GsonRequest<AllTopicsInfo> myReq = new GsonRequest<AllTopicsInfo>(
@@ -229,8 +229,8 @@ public class STTGeneralRoutines {
                 }
 
                 // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").equals("")) {
-                PreferenceHelper.getSharedPreferenceEditor().putString(Keys.ALL_TOPICS_LIST, subscribedTopics);
+                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();
                 //}
                 getAllUsers();
@@ -250,7 +250,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.ALL_USERS;   // + "/" + PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"");
+        String url = STTKeys.ALL_USERS;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
         Log.d(TAG, "AllUserss url - " + url);
 
         GsonRequest<AllUsersInfo> myReq = new GsonRequest<AllUsersInfo>(
@@ -298,8 +298,8 @@ public class STTGeneralRoutines {
                 }
 
                 // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").equals("")) {
-                /*PreferenceHelper.getSharedPreferenceEditor().putString(Keys.ALL_TOPICS_LIST, subscribedTopics);
+                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                /*PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();*/
                 //}
 
@@ -326,7 +326,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.REGISTER;   // + "/" + PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"");
+        String url = STTKeys.REGISTER;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
         Log.d(TAG, "AllUserss url - " + url);
 
         GsonRequest<MyResponse> myReq = new GsonRequest<MyResponse>(
@@ -366,7 +366,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.UNREGISTER;   // + "/" + PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"");
+        String url = STTKeys.UNREGISTER;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
         Log.d(TAG, "AllUserss url - " + url);
 
         GsonRequest<MyResponse> myReq = new GsonRequest<MyResponse>(
@@ -408,7 +408,7 @@ public class STTGeneralRoutines {
         }
         */
 
-        String url = Keys.AUTH;
+        String url = STTKeys.AUTH;
 
         GsonRequest<AuthInfo> myReq = new GsonRequest<AuthInfo>(
                 url,
@@ -435,7 +435,7 @@ public class STTGeneralRoutines {
 
                 if(!response.getToken().equals(null)) {
                     // store the subscribed topics as a string in shared preferences
-                    PreferenceHelper.getSharedPreferenceEditor().putString(Keys.AUTH_TOKEN, response.getToken());
+                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.AUTH_TOKEN, response.getToken());
                     PreferenceHelper.getSharedPreferenceEditor().commit();
                     Log.d("STTGeneralRoutines", response.getToken());
                 } else {
@@ -445,7 +445,7 @@ public class STTGeneralRoutines {
                 /*
                 if(response.getStatus() == 200) {
                     // store the subscribed topics as a string in shared preferences
-                    spEditor.putString(Keys.AUTH_TOKEN, response.getToken());
+                    spEditor.putString(STTKeys.AUTH_TOKEN, response.getToken());
                     spEditor.commit();
                     Log.d("STTGeneralRoutines", response.getToken());
                 } else if (response.getStatus() == 401) {
@@ -480,7 +480,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.INITCHAT;
+        String url = STTKeys.INITCHAT;
 
         GsonRequest<ChatTopicInfo> myReq = new GsonRequest<ChatTopicInfo>(
                 url,
@@ -509,7 +509,7 @@ public class STTGeneralRoutines {
                 try {
                     chatIntent = new Intent(STTarter.getInstance().getContext(), ChatActivity.class);
                     chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    chatIntent.putExtra(Keys.CHAT_TOPIC, response.getData().getTopic());
+                    chatIntent.putExtra(STTKeys.CHAT_TOPIC, response.getData().getTopic());
                     STTarter.getInstance().getContext().startActivity(chatIntent);
                 } catch (STTarter.ContextNotInitializedException e) {
                     e.printStackTrace();
@@ -530,7 +530,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.SUB;
+        String url = STTKeys.SUB;
 
         GsonRequest<SubscribeInfo> myReq = new GsonRequest<SubscribeInfo>(
                 url,
@@ -567,7 +567,7 @@ public class STTGeneralRoutines {
             Log.d(this.getClass().getCanonicalName(), "Unsub params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
-        String url = Keys.UNSUB;
+        String url = STTKeys.UNSUB;
 
         Log.d("Unsub Url",url);
 

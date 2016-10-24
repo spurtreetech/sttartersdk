@@ -3,7 +3,7 @@ package com.spurtreetech.sttarter.lib.helper;
 /**
  * Created by RahulT on 16-06-2015.
  */
-public class Keys {
+public class STTKeys {
 
     public static String USER_ID = "USER_ID";
     public static String USER_TOKEN = "USER_TOKEN";

@@ -1,6 +1,6 @@
 package com.spurtreetech.sttarter.lib.helper.models;
 
-import com.spurtreetech.sttarter.lib.helper.Keys;
+import com.spurtreetech.sttarter.lib.helper.STTKeys;
 
 /**
  * Created by rahul on 13/08/15.
@@ -35,7 +35,7 @@ public class LoginResponse {
     }
 
     public boolean isValidUser() {
-        return this.status == Keys.PERFECT_RESPONSE;
+        return this.status == STTKeys.PERFECT_RESPONSE;
     }
 
 

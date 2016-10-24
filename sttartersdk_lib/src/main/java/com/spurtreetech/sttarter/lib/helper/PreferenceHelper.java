@@ -12,7 +12,7 @@ public class PreferenceHelper {
     public static SharedPreferences getSharedPreference() {
         try {
             Log.d("PreferenceHelper", "Context - " + STTarter.getInstance().getContext());
-            return STTarter.getInstance().getContext().getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+            return STTarter.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
         } catch (STTarter.ContextNotInitializedException e) {
             e.printStackTrace();
         }
