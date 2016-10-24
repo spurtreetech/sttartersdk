@@ -1,10 +1,14 @@
 package com.spurtreetech.sttarter.lib.helper;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.google.gson.Gson;
 import com.spurtreetech.sttarter.lib.helper.models.AllTopicsInfo;
 import com.spurtreetech.sttarter.lib.helper.models.AllUsersInfo;
@@ -67,6 +71,10 @@ public class STTGeneralRoutines {
                 RequestQueueHelper.responseErrorListener(),
                 Request.Method.GET, params);
 
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
         RequestQueueHelper.addToRequestQueue(myReq, "");
 
     }
@@ -98,6 +106,24 @@ public class STTGeneralRoutines {
                         if(subscribedTopics.equals("")) {subscribedTopics = tempTopic.getTopic();}
                         else {subscribedTopics += ","+tempTopic.getTopic();}
                     }
+
+                    if (tempTopic.getType().contains("org")){
+                        SharedPreferences sp = null;
+                        try {
+                            sp = STTarter.getInstance().getContext().getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor spEditor = sp.edit();
+
+                            spEditor.putString(Keys.BUZZ_TOPIC,tempTopic.getTopic());
+                            Log.d("Buzz_Organization",tempTopic.getTopic());
+
+                            spEditor.commit();
+
+                        } catch (STTarter.ContextNotInitializedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
                 }
 
                 final MyTopicsInfo myTopicsResponse = response;
@@ -147,6 +173,10 @@ public class STTGeneralRoutines {
                 getAllTopicsSuccessListener(),
                 RequestQueueHelper.responseErrorListener(),
                 Request.Method.GET, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
 
         RequestQueueHelper.addToRequestQueue(myReq, "");
 
@@ -230,6 +260,10 @@ public class STTGeneralRoutines {
                 getAllUsersSuccessListener(),
                 RequestQueueHelper.responseErrorListener(),
                 Request.Method.GET, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
 
         RequestQueueHelper.addToRequestQueue(myReq, "");
 
@@ -383,6 +417,10 @@ public class STTGeneralRoutines {
                 getAuthTokenSuccessListener(),
                 RequestQueueHelper.responseErrorListener(),
                 Request.Method.POST, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
 
         // set this to be executed before any other rquesst in queue
         myReq.setSequence(0);

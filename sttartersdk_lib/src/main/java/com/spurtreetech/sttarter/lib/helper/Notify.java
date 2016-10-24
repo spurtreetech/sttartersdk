@@ -68,11 +68,11 @@ public class Notify {
         .setTicker(ticker)
         .setWhen(when)
         .setGroup("com.spurtreetech.sttarter.lib.helper");
-        //.setSmallIcon(R.mipmap.autosense);
+       // .setSmallIcon(R.mipmap.autosense);
 
     Notification notification = notificationCompat.build();
     //display the notification
-    if (((Boolean)BuildUtils.getBuildConfigValue(context, "DEBUG"))) {
+    if (((Boolean) BuildUtils.getBuildConfigValue(context, "DEBUG"))) {
         // mNotificationManager.notify(MessageID, notification);
         // uncomment below code to receive multiple notifications
         //MessageID++;
@@ -87,7 +87,7 @@ public class Notify {
    */
   static void toast(Context context, CharSequence text, int duration) {
       //Toast.makeText(context, "BuildConfig.DEBUG: " + ((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG")), duration).show();
-      if (((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG"))) {
+      if (((Boolean) BuildUtils.getBuildConfigValue(context,"DEBUG"))) {
           //Toast toast = Toast.makeText(context, text, duration);
           //toast.show();
       }

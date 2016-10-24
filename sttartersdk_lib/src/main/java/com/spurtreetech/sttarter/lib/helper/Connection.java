@@ -98,7 +98,7 @@ public class Connection {
    * @return a new instance of <code>Connection</code>
    */
   public static Connection createConnection(String clientId, String host,
-      int port, Context context, boolean sslConnection) {
+                                            int port, Context context, boolean sslConnection) {
     String handle = null;
     String uri = null;
     if (sslConnection) {
@@ -126,7 +126,7 @@ public class Connection {
    * @param sslConnection true if the connection is secured by SSL
    */
   public Connection(String clientHandle, String clientId, String host,
-      int port, Context context, MqttAndroidClient client, boolean sslConnection) {
+                    int port, Context context, MqttAndroidClient client, boolean sslConnection) {
     //generate the client handle from its hash code
     this.clientHandle = clientHandle;
     this.clientId = clientId;

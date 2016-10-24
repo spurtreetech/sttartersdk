@@ -42,7 +42,7 @@ public class DateTimeHelper {
 
     public static String getTimeStampFromUnixTime(String unixTimeString) {
         long unixTime = Long.parseLong(unixTimeString);
-        java.util.Date time = new java.util.Date((long)unixTime*1000);
+        Date time = new Date((long)unixTime*1000);
         DateTime dt = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time));
         dt.changeTimeZone(Calendar.getInstance().getTimeZone(), TimeZone.getTimeZone("GMT"));
         Log.d("DateTimeHelper", "getTimeStampFromUnixTime: " + dt.toString());
@@ -63,7 +63,7 @@ public class DateTimeHelper {
 
     public static  String getElapsedTime(Long unixTimeStamp) {
         //long unixTime = Long.parseLong(unixTimeStamp);
-        java.util.Date time = new java.util.Date((long)unixTimeStamp*1000);
+        Date time = new Date((long)unixTimeStamp*1000);
         //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //DateTime dt = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time));
         //Date date = new Date(time);
@@ -149,7 +149,7 @@ public class DateTimeHelper {
 
     public static  String getTimeOrDateString(Long unixTimeStamp) {
         //long unixTime = Long.parseLong(unixTimeStamp);
-        java.util.Date time = new java.util.Date((long)unixTimeStamp*1000);
+        Date time = new Date((long)unixTimeStamp*1000);
         //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //DateTime dt = new DateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time));
         //Date date = new Date(time);
@@ -186,7 +186,7 @@ public class DateTimeHelper {
         SimpleDateFormat sdfOtherYear =new SimpleDateFormat(dateTimeFormatStringLastYear);
 
 
-        java.util.Date time = new java.util.Date(smsTimeInMilis);
+        Date time = new Date(smsTimeInMilis);
 
         final long HOURS = 60 * 60 * 60;
         if(now.get(Calendar.DATE) == smsTime.get(Calendar.DATE) ){
