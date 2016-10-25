@@ -12,6 +12,11 @@
  */
 package org.eclipse.paho.android.service;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttPingSender;
+import org.eclipse.paho.client.mqttv3.internal.ClientComms;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -19,14 +24,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
-
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttPingSender;
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 
 /**
  * Default ping sender implementation on Android. It is based on AlarmManager.
@@ -73,7 +74,7 @@ class AlarmPingSender implements MqttPingSender {
 
 		pendingIntent = PendingIntent.getBroadcast(service, 0, new Intent(
 				action), PendingIntent.FLAG_UPDATE_CURRENT);
-		
+
 		schedule(comms.getKeepAlive());
 		hasStarted = true;
 	}
@@ -103,8 +104,13 @@ class AlarmPingSender implements MqttPingSender {
 		Log.d(TAG, "Schedule next alarm at " + nextAlarmInMilliseconds);
 		AlarmManager alarmManager = (AlarmManager) service
 				.getSystemService(Service.ALARM_SERVICE);
-		alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds,
-				pendingIntent);
+		if (Build.VERSION.SDK_INT >= 19) {
+			alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds,
+					pendingIntent);
+		} else {
+			alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds,
+					pendingIntent);
+		}
 	}
 
 	/*
@@ -122,50 +128,51 @@ class AlarmPingSender implements MqttPingSender {
 			// This guarantees that the phone will not sleep until you have
 			// finished handling the broadcast.", but this class still get
 			// a wake lock to wait for ping finished.
-			int count = (int)intent.getLongExtra(Intent.EXTRA_ALARM_COUNT, -1);
+			int count;
+			try {
+				count = intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, -1);
+			} catch (ClassCastException ex){
+				// This is a Motorola Phone (Probably a Moto G or X)
+				// And so Intent.EXTRA_ALARM_COUNT is actually a Long!
+				Long longCount = intent.getLongExtra(Intent.EXTRA_ALARM_COUNT, -1);
+				count = longCount.intValue();
+			}
+
 			Log.d(TAG, "Ping " + count + " times.");
 
 			Log.d(TAG, "Check time :" + System.currentTimeMillis());
-			IMqttToken token = comms.checkForActivity();
 
-			// No ping has been sent.
-			if (token == null) {
-				return;
-			}
+			PowerManager pm = (PowerManager) service
+					.getSystemService(Service.POWER_SERVICE);
+			wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
+			wakelock.acquire();
 
 			// Assign new callback to token to execute code after PingResq
 			// arrives. Get another wakelock even receiver already has one,
 			// release it until ping response returns.
-			if (wakelock == null) {
-				PowerManager pm = (PowerManager) service
-						.getSystemService(Service.POWER_SERVICE);
-				wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-						wakeLockTag);
-			}
-			wakelock.acquire();
-			token.setActionCallback(new IMqttActionListener() {
+			IMqttToken token = comms.checkForActivity(new IMqttActionListener() {
 
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					Log.d(TAG, "Success. Release lock(" + wakeLockTag + "):"
 							+ System.currentTimeMillis());
 					//Release wakelock when it is done.
-					if(wakelock != null && wakelock.isHeld()){
-						wakelock.release();
-					}
+					wakelock.release();
 				}
 
 				@Override
 				public void onFailure(IMqttToken asyncActionToken,
-						Throwable exception) {
+									  Throwable exception) {
 					Log.d(TAG, "Failure. Release lock(" + wakeLockTag + "):"
 							+ System.currentTimeMillis());
 					//Release wakelock when it is done.
-					if(wakelock != null && wakelock.isHeld()){
-						wakelock.release();
-					}
+					wakelock.release();
 				}
 			});
+
+			if (token == null && wakelock.isHeld()) {
+				wakelock.release();
+			}
 		}
 	}
 }
