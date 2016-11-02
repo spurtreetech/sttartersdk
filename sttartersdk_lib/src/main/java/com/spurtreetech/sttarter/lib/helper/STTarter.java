@@ -3,6 +3,7 @@ package com.spurtreetech.sttarter.lib.helper;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -57,7 +58,7 @@ public class STTarter {
     SharedPreferences sp;
     SharedPreferences.Editor spEditor;
     private MqttAndroidClient client;
-    private MqttConnectOptions conOpt;
+    private MqttConnectOptions  conOpt;
 
 
     public static final String TAG = STTarter.class.getSimpleName();
@@ -155,7 +156,7 @@ public class STTarter {
     }
 
 
-    public void loginUserRequestForOTP(String url, Response.Listener<LoginResponse> registerSuccessListener, Response.ErrorListener loginResponseListener, String mobileStr, String orgStr, Context applicationContext) {
+    public void loginUserRequestForOTP(String url,Response.Listener<LoginResponse> registerSuccessListener, Response.ErrorListener loginResponseListener,String mobileStr, String orgStr, Context applicationContext) {
 
         this.context = applicationContext;
 
@@ -184,7 +185,7 @@ public class STTarter {
     }
 
 
-    public void confirmOTPWithServer(String url, String otpCode, Response.Listener<LoginOTPResponse> getOtpSuccessListener, Response.ErrorListener getOTPResponseListener, String mobileStr, String orgStr, Context applicationContext) {
+    public void confirmOTPWithServer(String url,String otpCode,Response.Listener<LoginOTPResponse> getOtpSuccessListener, Response.ErrorListener getOTPResponseListener,String mobileStr, String orgStr, Context applicationContext) {
 
         this.context = applicationContext;
 
@@ -212,7 +213,7 @@ public class STTarter {
     }
 
 
-    public void quickLogin(String url, Response.Listener<LoginOTPResponse> getSuccessListener, Response.ErrorListener getErrorListener, String name, String mobileStr, String emailStr, String orgStr, Context applicationContext) {
+    public void quickLogin(String url,Response.Listener<LoginOTPResponse> getSuccessListener, Response.ErrorListener getErrorListener,String name,String mobileStr,String emailStr, String orgStr, Context applicationContext) {
 
         this.context = applicationContext;
 
@@ -621,7 +622,7 @@ public class STTarter {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
-        MqttConnectOptions conOpt = new MqttConnectOptions();
+        MqttConnectOptions  conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
         Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());

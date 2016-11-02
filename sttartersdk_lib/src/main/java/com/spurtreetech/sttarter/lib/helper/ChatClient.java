@@ -75,7 +75,7 @@ public class ChatClient {
 
         PayloadData pd = new PayloadData();
         pd.setType("message");
-        pd.setTimestamp(""+ DateTimeHelper.getUnixTimeStamp());
+        pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
         pd.setFrom(PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
 
         Payload tempPayload = new Payload();
@@ -103,7 +103,7 @@ public class ChatClient {
         String user = PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
         PayloadData pd = new PayloadData();
         pd.setType("system");
-        pd.setTimestamp(""+ DateTimeHelper.getUnixTimeStamp());
+        pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
         pd.setFrom(user);
 
         Payload tempPayload = new Payload();
