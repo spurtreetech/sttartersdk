@@ -60,24 +60,38 @@ public class STTCallbackHandler implements MqttCallback {
     public void connectionLost(Throwable cause) {
 //	  cause.printStackTrace();
         if (cause != null) {
-            Connection c = Connections.getInstance(context).getConnection(clientHandle);
-            c.addAction("Connection Lost");
-            c.changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
+            Connection c = null;
+            if (context!=null) {
+                c = Connections.getInstance(context).getConnection(clientHandle);
+            }
+            else {
+                try {
+                    c = Connections.getInstance(STTarter.getInstance().getContext()).getConnection(clientHandle);
+                } catch (STTarter.ContextNotInitializedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-            //format string to use a notification text
-            Object[] args = new Object[2];
-            args[0] = c.getId();
-            args[1] = c.getHostName();
+            if (c!=null) {
+                c.addAction("Connection Lost");
+                c.changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
 
-            String message = context.getString(R.string.connection_lost, args);
+                //format string to use a notification text
+                Object[] args = new Object[2];
+                args[0] = c.getId();
+                args[1] = c.getHostName();
 
-            //build intent
-            Intent intent = new Intent();
-            intent.setClassName(context, notificationActivity);
-            intent.putExtra("handle", clientHandle);
+                String message = context.getString(R.string.connection_lost, args);
 
-            //notify the user
-            Notify.notifcation(context, message, intent, R.string.notifyTitle_connectionLost);
+                //build intent
+                Intent intent = new Intent();
+                intent.setClassName(context, notificationActivity);
+                intent.putExtra("handle", clientHandle);
+
+                //notify the user
+                Notify.notifcation(context, message, intent, R.string.notifyTitle_connectionLost);
+
+            }
             // TODO try to restart connection if internet connection is available
             try {
                 STTarter.getInstance().initiateConnnection(notificationHelperListener);

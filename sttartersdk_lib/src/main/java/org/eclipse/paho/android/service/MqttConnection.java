@@ -1010,64 +1010,69 @@ class MqttConnection implements MqttCallbackExtended {
 	* multiple times 
 	*/
 	synchronized void reconnect() {
-		if (isConnecting) {
-			service.traceDebug(TAG, "The client is connecting. Reconnect return directly.");
-			return ;
-		}
-		
-		if(!service.isOnline()){
-			service.traceDebug(TAG,
-					"The network is not reachable. Will not do reconnect");
-			return;
-		}
-
-		if (disconnected && !cleanSession) {
-			// use the activityToke the same with action connect
-			service.traceDebug(TAG,"Do Real Reconnect!");
-			final Bundle resultBundle = new Bundle();
-			resultBundle.putString(
-				MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN,
-				reconnectActivityToken);
-			resultBundle.putString(
-				MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, null);
-			resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION,
-				MqttServiceConstants.CONNECT_ACTION);
-			
-			try {
-				
-				IMqttActionListener listener = new MqttConnectionListener(resultBundle) {
-					@Override
-					public void onSuccess(IMqttToken asyncActionToken) {
-						// since the device's cpu can go to sleep, acquire a
-						// wakelock and drop it later.
-						service.traceDebug(TAG,"Reconnect Success!");
-						service.traceDebug(TAG,"DeliverBacklog when reconnect.");
-						doAfterConnectSuccess(resultBundle);
-					}
-					
-					@Override
-					public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-						resultBundle.putString(
-								MqttServiceConstants.CALLBACK_ERROR_MESSAGE,
-								exception.getLocalizedMessage());
-						resultBundle.putSerializable(
-								MqttServiceConstants.CALLBACK_EXCEPTION,
-								exception);
-						service.callbackToActivity(clientHandle, Status.ERROR,
-								resultBundle);
-
-						doAfterConnectFail(resultBundle);
-						
-					}
-				};
-				
-				myClient.connect(connectOptions, null, listener);
-				setConnectingState(true);
-			} catch (MqttException e) {
-				service.traceError(TAG, "Cannot reconnect to remote server." + e.getMessage());
-				setConnectingState(false);
-				handleException(resultBundle, e);
+		try {
+			if (isConnecting) {
+				service.traceDebug(TAG, "The client is connecting. Reconnect return directly.");
+				return;
 			}
+
+			if (!service.isOnline()) {
+				service.traceDebug(TAG,
+						"The network is not reachable. Will not do reconnect");
+				return;
+			}
+
+			if (disconnected && !cleanSession) {
+				// use the activityToke the same with action connect
+				service.traceDebug(TAG, "Do Real Reconnect!");
+				final Bundle resultBundle = new Bundle();
+				resultBundle.putString(
+						MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN,
+						reconnectActivityToken);
+				resultBundle.putString(
+						MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, null);
+				resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION,
+						MqttServiceConstants.CONNECT_ACTION);
+
+				try {
+
+					IMqttActionListener listener = new MqttConnectionListener(resultBundle) {
+						@Override
+						public void onSuccess(IMqttToken asyncActionToken) {
+							// since the device's cpu can go to sleep, acquire a
+							// wakelock and drop it later.
+							service.traceDebug(TAG, "Reconnect Success!");
+							service.traceDebug(TAG, "DeliverBacklog when reconnect.");
+							doAfterConnectSuccess(resultBundle);
+						}
+
+						@Override
+						public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+							resultBundle.putString(
+									MqttServiceConstants.CALLBACK_ERROR_MESSAGE,
+									exception.getLocalizedMessage());
+							resultBundle.putSerializable(
+									MqttServiceConstants.CALLBACK_EXCEPTION,
+									exception);
+							service.callbackToActivity(clientHandle, Status.ERROR,
+									resultBundle);
+
+							doAfterConnectFail(resultBundle);
+
+						}
+					};
+
+					myClient.connect(connectOptions, null, listener);
+					setConnectingState(true);
+				} catch (MqttException e) {
+					service.traceError(TAG, "Cannot reconnect to remote server." + e.getMessage());
+					setConnectingState(false);
+					handleException(resultBundle, e);
+				}
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 	
