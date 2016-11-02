@@ -139,6 +139,7 @@ public class STTarter {
 
         this.userId = userID;
 
+        //context.startService(new Intent(context,MessagingService.class));
 
         /** client handle is Uri(host+port) + clientId **/
         this.clientId = getClientId();
@@ -855,7 +856,11 @@ public class STTarter {
     }
 
     public void logout() {
-        STTarter.getInstance().client.stopService();
+        try {
+            STTarter.getInstance().client.disconnect();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
         STTProviderHelper ph = new STTProviderHelper();
         ph.emptyAllTable();
 //STTarter.getInstance().getContext().getDatabasePath(STTSQLiteOpenHelper.DATABASE_FILE_NAME).delete();

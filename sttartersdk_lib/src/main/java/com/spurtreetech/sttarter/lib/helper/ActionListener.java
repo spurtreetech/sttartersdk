@@ -215,7 +215,7 @@ class ActionListener implements IMqttActionListener {
 
   /**
    * The action associated with the object was a failure
-   * 
+   *
    * @param token
    *            This argument is not used
    * @param exception
@@ -242,7 +242,7 @@ class ActionListener implements IMqttActionListener {
 
   /**
    * A publish action was unsuccessful, notify user and update client history
-   * 
+   *
    * @param exception
    *            This argument is not used
    */

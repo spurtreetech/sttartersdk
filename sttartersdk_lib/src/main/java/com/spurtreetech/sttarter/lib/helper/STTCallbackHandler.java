@@ -194,7 +194,7 @@ public class STTCallbackHandler implements MqttCallback {
 
                 Log.i(this.getClass().getSimpleName(), "Message not found and Message not by sender");
 
-                if(STTarter.isApplicationSentToBackground()) {
+                //if(STTarter.getInstance().isApplicationInBackground()) {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, false);
@@ -218,12 +218,12 @@ public class STTCallbackHandler implements MqttCallback {
                         this.notificationHelperListener.displayNotification(notificationString);
                         //NotificationHelper.displayNotification(notificationString);
                     }
-                } else {
+                /*} else {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, true);
                     ph.updateTopicActiveTime(pd);
-                }
+                }*/
             }
 
         }
