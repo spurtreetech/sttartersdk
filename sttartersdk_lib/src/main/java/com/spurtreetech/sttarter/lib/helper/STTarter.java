@@ -146,6 +146,7 @@ public class STTarter {
         this.clientId = getClientId();
 
         try {
+            if (notificationHelperListener!=null)
             initiateConnnection(notificationHelperListener);
         } catch (ContextNotInitializedException e) {
             e.printStackTrace();
@@ -329,6 +330,7 @@ public class STTarter {
         Log.d("STTarter", "USER_ID - " + userId);
 
         try {
+            if (notificationHelperListener!=null)
             initiateConnnection(notificationHelperListener);
         } catch (ContextNotInitializedException e) {
             e.printStackTrace();
@@ -584,6 +586,7 @@ public class STTarter {
             bundle.putBoolean(ActivityConstants.ssl,
                     ActivityConstants.defaultSsl);
 
+            if (notificationHelperListener!=null)
             connectAction(bundle,notificationHelperListener);
         } else {
             throw new ContextNotInitializedException("No user id specified");
