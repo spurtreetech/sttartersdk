@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#529EB8</color>
+    <color name="colorPrimaryDark">#438196</color>
+    <color name="colorAccent">#529EB8</color>
     <color name="light_orange">#fff7ec</color>
     <color name="primary">#CC2B27</color>
     <color name="primary_dark">#A72222</color>
@@ -11,4 +14,9 @@
     <color name="butter_scotch">#ffab40</color>
     <color name="text_color_21">#212121</color>
     <color name="green_circle">#008000</color>
+    <color name="black">#000000</color>
+    <color name="darkGrey">#898989</color>
+    <color name="grey">#F0F3F5</color>
+    <color name="lightGrey">#C7C7CD</color>
+    <color name="extraDarkGrey">#333333</color>
 </resources>

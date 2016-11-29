@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">STTarter</string>
 
-    <!-- STTarter Library -->
+    <!-- STTarterManager Library -->
     <string name="menu_settings">Settings</string>
     <string name="server">Server</string>
     <string name="port">Port</string>
@@ -19,7 +19,7 @@
     <string name="publish">Publish</string>
     <string name="title_activity_subscribe">Subscribe</string>
     <string name="disconnected">Disconnected from</string>
-    <string name="topic">Topic</string>
+    <string name="group">Topic</string>
     <string name="history">History</string>
     <string name="title_activity_history">History</string>
     <string name="subscribed">Subscribed to </string>
@@ -71,11 +71,11 @@
     <!-- Strings that need formatting  -->
     <string name="messageRecieved">Received message %1$s &lt;br/&gt; &lt;small&gt;Topic: %2$s &lt;/small&gt; </string>
     <string name="timestamp">&lt;br/&gt; &lt;small&gt; %1$s &lt;/small&gt;</string>
-    <string name="notification">%1$s has received %2$s on topic %3$s</string>
-    <string name="toast_pub_success">Published message: %1$s to topic: %2$s</string>
+    <string name="notification">%1$s has received %2$s on group %3$s</string>
+    <string name="toast_pub_success">Published message: %1$s to group: %2$s</string>
     <string name="toast_sub_success">Subscribed to %1$s</string>
     <string name="toast_disconnected">Disconnected</string>
-    <string name="toast_pub_failed">Failed to publish message: %1$s to topic: %2$s</string>
+    <string name="toast_pub_failed">Failed to publish message: %1$s to group: %2$s</string>
     <string name="toast_sub_failed">Failed to subscribe to %1$s</string>
     <string name="connection_lost">%1$s has lost connection to %2$s</string>
     <string name="failure_disconnect">Disconnect failed.&lt;br/&gt; &lt;small&gt;Reason: %s&lt;/small&gt; </string>

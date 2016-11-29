@@ -7,4 +7,10 @@
         <item name="android:windowNoTitle">true</item>
         -->
     </style>
+
+    <style name="textViewStyleMedium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
+
 </resources>
