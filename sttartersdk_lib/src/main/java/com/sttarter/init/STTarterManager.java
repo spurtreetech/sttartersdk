@@ -314,7 +314,7 @@ public class STTarterManager {
                 spEditor.putString(STTKeys.USER_TOKEN,responseFromSignUp.getUser().getUser_token());
                 spEditor.commit();
 
-                ReferralManager.getInstance().signup(responseFromSignUp.getUser().getStt_id()+"",responseFromSignUp.getUser().getUsername(),responseFromSignUp.getUser().getEmail(),responseFromSignUp.getUser().getMobile(),referralCode,sTTSuccessListener,getSignUpErrorListener);
+                ReferralManager.getInstance().signup(responseFromSignUp.getUser().getUsername(),responseFromSignUp.getUser().getName(),responseFromSignUp.getUser().getEmail(),responseFromSignUp.getUser().getMobile(),referralCode,sTTSuccessListener,getSignUpErrorListener);
 
             }
         };
