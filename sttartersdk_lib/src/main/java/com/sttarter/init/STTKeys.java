@@ -7,7 +7,7 @@ public class STTKeys {
 
     public static String USER_ID = "USER_ID";
     public static String USER_EMAIL = "USER_EMAIL";
-    public static String USER_USERNAME = "USER_USERNAME";
+    public static String USER_NAME = "USER_NAME";
     public static String USER_TOKEN = "USER_TOKEN";
     public static String APP_KEY = "APP_KEY";
     public static String APP_SECRET = "APP_SECRET";
@@ -50,6 +50,8 @@ public class STTKeys {
     public static String REFERRAL_SIGNUP = HOST + "referral/newsignup";
     public static String GET_REFERRAL_CODE = HOST + "referral/getreferralcode";
     public static String ADD_REFERRAL_TRANSACTION = HOST + "referral/addtransaction";
+    public static String CHANGE_REFERRAL_CODE = HOST + "referral/changereferralcode";
+    public static String TRACK_REFERRAL_USAGE = HOST + "referral/trackusage";
 
     /* chat server url */
     public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";

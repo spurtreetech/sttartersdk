@@ -226,8 +226,8 @@ public class STTarterManager {
 
                     // TODO save the appToken in SharedPreference and userToken to build requests to the server
 
-                    spEditor.putString(STTKeys.USER_ID,loginResponse.getStt_id()+"");
-                    spEditor.putString(STTKeys.USER_USERNAME,loginResponse.getUsername());
+                    spEditor.putString(STTKeys.USER_ID,loginResponse.getUsername());
+                    spEditor.putString(STTKeys.USER_NAME,loginResponse.getName());
                     spEditor.putString(STTKeys.USER_EMAIL,loginResponse.getEmail());
                     spEditor.putString(STTKeys.USER_PHONE,loginResponse.getMobile());
                     spEditor.putString(STTKeys.USER_TOKEN,loginResponse.getUser_token());
@@ -307,8 +307,8 @@ public class STTarterManager {
                 Log.d("SignUpResponse",responseFromSignUp.toString());
                 sp = applicationContext.getSharedPreferences(STTKeys.STTARTER_PREFERENCES,Context.MODE_PRIVATE);
                 spEditor = sp.edit();
-                spEditor.putString(STTKeys.USER_ID,responseFromSignUp.getUser().getStt_id()+"");
-                spEditor.putString(STTKeys.USER_USERNAME,responseFromSignUp.getUser().getUsername());
+                spEditor.putString(STTKeys.USER_ID,responseFromSignUp.getUser().getUsername()+"");
+                spEditor.putString(STTKeys.USER_NAME,responseFromSignUp.getUser().getName());
                 spEditor.putString(STTKeys.USER_EMAIL,responseFromSignUp.getUser().getEmail());
                 spEditor.putString(STTKeys.USER_PHONE,responseFromSignUp.getUser().getMobile());
                 spEditor.putString(STTKeys.USER_TOKEN,responseFromSignUp.getUser().getUser_token());
@@ -779,16 +779,16 @@ public class STTarterManager {
         //this.client = client;
         this.conOpt = conOpt;
         if (doConnect) {
-                Thread t = new Thread(){
-                    public void run(){
-                        try {
-                            STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
+            Thread t = new Thread(){
+                public void run(){
+                    try {
+                        STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
                     }
-                };
-                t.start();
+                }
+            };
+            t.start();
         }
 
         /*
@@ -884,7 +884,7 @@ public class STTarterManager {
         this.context = context;
         try {
             if (client!=null && client.isConnected())
-            client.disconnect();
+                client.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
         }

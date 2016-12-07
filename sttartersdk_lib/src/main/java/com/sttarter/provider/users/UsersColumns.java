@@ -1,8 +1,11 @@
 package com.sttarter.provider.users;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.google.gson.Gson;
+import com.sttarter.common.models.User;
 import com.sttarter.provider.STTContentProvider;
 
 /**
@@ -60,5 +63,33 @@ public class UsersColumns implements BaseColumns {
         }
         return false;
     }
+
+
+    public static User completeRow(Cursor cursor)
+    {
+        User user = new User();
+        try
+        {
+            user.setStt_id(cursor.getInt(cursor.getColumnIndexOrThrow(USERS_USER_ID)));
+            user.setName(cursor.getString(cursor.getColumnIndexOrThrow(USERS_NAME)));
+            //user.setCreated_by(cursor.getColumnIndexOrThrow(TOPIC_UPDATED_UNIX_TIMESTAMP)+"");
+            user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERS_USERNAME)));
+            //user.setId("");
+            Gson gson = new Gson();
+            user.setMeta(cursor.getString(cursor.getColumnIndexOrThrow(USERS_META)));
+            user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(USERS_EMAIL)));
+            user.setMobile(cursor.getString(cursor.getColumnIndexOrThrow(USERS_MOBILE)));
+            user.setAvatar(cursor.getString(cursor.getColumnIndexOrThrow(USERS_AVATAR)));
+
+            //user.setUsers();
+            return user;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
 
 }

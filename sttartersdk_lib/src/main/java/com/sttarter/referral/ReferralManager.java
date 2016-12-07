@@ -1,13 +1,19 @@
 package com.sttarter.referral;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
+import com.sttarter.common.responses.AppAuthResponse;
 import com.sttarter.common.responses.STTResponse;
+import com.sttarter.common.utils.GsonRequest;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.init.PreferenceHelper;
 import com.sttarter.init.RequestQueueHelper;
@@ -62,6 +68,10 @@ public class ReferralManager {
 
         jsonObjReq.setShouldCache(false);
 
+        int socketTimeout = 30000; //or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjReq.setRetryPolicy(policy);
+
         // Adding request to request queue
         RequestQueueHelper.addToRequestQueue(jsonObjReq);
     }
@@ -71,7 +81,7 @@ public class ReferralManager {
         return new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject responseFromSignUp) {
-
+                Log.d("refee",responseFromSignUp.toString());
                 sTTSuccessListener.Response(new STTResponse());
 
             }
@@ -84,7 +94,7 @@ public class ReferralManager {
 
         try {
             jsonObject.put("externalUserId", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,""));
-            jsonObject.put("name", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_USERNAME,""));
+            jsonObject.put("name", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_NAME,""));
             jsonObject.put("email", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_EMAIL,""));
             jsonObject.put("phone", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_PHONE,""));
 
@@ -164,6 +174,54 @@ public class ReferralManager {
             }
         };
     }
+
+    public void customizeReferralCode(String oldCode, String newCode, STTReferralInterface sttReferralInterface, Response.ErrorListener errorListener) {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("code", oldCode);
+            jsonObject.put("custom_code", newCode);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String url = STTKeys.CHANGE_REFERRAL_CODE;
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, jsonObject, getReferranceSuccessListener(sttReferralInterface), errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return ReferralManager.getHeaders();
+            }
+        };
+
+        jsonObjReq.setShouldCache(false);
+
+        // Adding request to request queue
+        RequestQueueHelper.addToRequestQueue(jsonObjReq);
+    }
+
+
+    /*public void TrackUsage(STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
+        String url = STTKeys.TRACK_REFERRAL_USAGE+"/"+PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
+
+        Map<String, String> params = new HashMap<String, String>();
+
+
+        GsonRequest<AppAuthResponse> myReq = new GsonRequest<AppAuthResponse>(
+                url,
+                AppAuthResponse.class,
+                RequestQueueHelper.getHeaders(),
+                getAuthSuccessListener(sttSuccessListener),
+                getAuthResponseListener,
+                Request.Method.POST, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }*/
 
 
     protected static Map<String, String>  getHeaders() {
