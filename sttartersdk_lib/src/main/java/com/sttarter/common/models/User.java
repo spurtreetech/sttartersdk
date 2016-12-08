@@ -12,6 +12,7 @@ public class User {
     private String mobile;
     private String avatar;
     private String meta;
+    private String signup_date;
     private String master_topic;
     private String org_topic;
     private String user_token;
@@ -21,7 +22,6 @@ public class User {
 
     private String dateOfBirth;
     private String password;
-
 
     public int getStt_id() {
         return stt_id;
@@ -79,6 +79,14 @@ public class User {
         this.meta = meta;
     }
 
+    public String getSignup_date() {
+        return signup_date;
+    }
+
+    public void setSignup_date(String signup_date) {
+        this.signup_date = signup_date;
+    }
+
     public String getMaster_topic() {
         return master_topic;
     }
@@ -93,6 +101,14 @@ public class User {
 
     public void setOrg_topic(String org_topic) {
         this.org_topic = org_topic;
+    }
+
+    public String getUser_token() {
+        return user_token;
+    }
+
+    public void setUser_token(String user_token) {
+        this.user_token = user_token;
     }
 
     public boolean is_active() {
@@ -125,13 +141,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getUser_token() {
-        return user_token;
-    }
-
-    public void setUser_token(String user_token) {
-        this.user_token = user_token;
     }
 }

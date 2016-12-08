@@ -615,9 +615,8 @@ public class STTarterManager {
 
     }
 
-    public String getUserId(){
-
-        return this.userId;
+    public String getUsername(){
+        return PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
     }
 
     public String getClientId() {

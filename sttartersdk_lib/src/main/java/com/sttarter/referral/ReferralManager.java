@@ -11,6 +11,8 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
+import com.sttarter.common.models.User;
+import com.sttarter.common.models.UserList;
 import com.sttarter.common.responses.AppAuthResponse;
 import com.sttarter.common.responses.STTResponse;
 import com.sttarter.common.utils.GsonRequest;
@@ -67,10 +69,6 @@ public class ReferralManager {
         };
 
         jsonObjReq.setShouldCache(false);
-
-        int socketTimeout = 30000; //or (30000)30 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        jsonObjReq.setRetryPolicy(policy);
 
         // Adding request to request queue
         RequestQueueHelper.addToRequestQueue(jsonObjReq);
@@ -202,26 +200,27 @@ public class ReferralManager {
     }
 
 
-    /*public void TrackUsage(STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
+    public void trackUsage(Response.Listener<UserList> successListener, Response.ErrorListener errorListener) {
+
         String url = STTKeys.TRACK_REFERRAL_USAGE+"/"+PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
 
         Map<String, String> params = new HashMap<String, String>();
 
 
-        GsonRequest<AppAuthResponse> myReq = new GsonRequest<AppAuthResponse>(
+        GsonRequest<UserList> myReq = new GsonRequest<UserList>(
                 url,
-                AppAuthResponse.class,
+                UserList.class,
                 RequestQueueHelper.getHeaders(),
-                getAuthSuccessListener(sttSuccessListener),
-                getAuthResponseListener,
-                Request.Method.POST, params);
+                successListener,
+                errorListener,
+                Request.Method.GET, params);
 
         int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         myReq.setRetryPolicy(policy);
 
         RequestQueueHelper.addToRequestQueue(myReq, "");
-    }*/
+    }
 
 
     protected static Map<String, String>  getHeaders() {
