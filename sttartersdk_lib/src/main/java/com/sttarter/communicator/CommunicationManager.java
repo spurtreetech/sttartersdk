@@ -11,20 +11,24 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.google.gson.Gson;
-import com.sttarter.init.Connections;
+import com.sttarter.common.models.AuthInfo;
+import com.sttarter.common.models.UserList;
+import com.sttarter.common.responses.STTResponse;
 import com.sttarter.common.utils.GsonRequest;
+import com.sttarter.communicator.models.AllTopicsInfo;
+import com.sttarter.communicator.models.CreateGroupResponse;
+import com.sttarter.communicator.models.Group;
+import com.sttarter.communicator.models.MyTopicsInfo;
+import com.sttarter.communicator.models.SubscribeInfo;
+import com.sttarter.helper.interfaces.STTSuccessListener;
+import com.sttarter.init.Connections;
 import com.sttarter.init.PreferenceHelper;
 import com.sttarter.init.RequestQueueHelper;
 import com.sttarter.init.STTKeys;
 import com.sttarter.init.STTarterManager;
-import com.sttarter.communicator.models.AllTopicsInfo;
-import com.sttarter.common.models.UserList;
-import com.sttarter.common.models.AuthInfo;
-import com.sttarter.common.responses.STTResponse;
-import com.sttarter.communicator.models.MyTopicsInfo;
-import com.sttarter.communicator.models.SubscribeInfo;
-import com.sttarter.communicator.models.Group;
 import com.sttarter.provider.STTProviderHelper;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +40,7 @@ import java.util.Map;
 
 public class CommunicationManager {
 
+    private static CommunicationManager instance = null;
     private static final String TAG = "STTGeneralRoutines";
     //SharedPreferences sp = PreferenceHelper.getSharedPreference();
     //SharedPreferences.Editor spEditor = PreferenceHelper.getSharedPreferenceEditor();
@@ -43,6 +48,14 @@ public class CommunicationManager {
     public static final String GET_ALL_TOPICS = "getAllTopics";
     public static final String RETRIEVE_NEW_TOKEN = "retieveNewToken";
 
+    public static synchronized CommunicationManager getInstance() {
+
+        if(CommunicationManager.instance == null) {
+            CommunicationManager.instance = new CommunicationManager();
+        }
+
+        return CommunicationManager.instance;
+    }
 
     public void subscribeInitalize() {
 
@@ -69,15 +82,6 @@ public class CommunicationManager {
         }
 
         String url = STTKeys.MY_TOPICS + "/" ;//+ PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
-
-        try {
-            SharedPreferences sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-            if (!TextUtils.isEmpty(sp.getString(STTKeys.USERDEFINED_BASE_HOST,""))){
-                url = url.replace("sttarter.com",sp.getString(STTKeys.USERDEFINED_BASE_HOST,""));
-            }
-        } catch (STTarterManager.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
 
         Log.d(TAG, "MyTopics url - " + url);
 
@@ -183,15 +187,6 @@ public class CommunicationManager {
 
         String url = STTKeys.ALL_TOPICS;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
 
-        try {
-            SharedPreferences sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-            if (!TextUtils.isEmpty(sp.getString(STTKeys.USERDEFINED_BASE_HOST,""))){
-                url = url.replace("sttarter.com",sp.getString(STTKeys.USERDEFINED_BASE_HOST,""));
-            }
-        } catch (STTarterManager.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
-
         Log.d(TAG, "AllTopics url - " + url);
 
         GsonRequest<AllTopicsInfo> myReq = new GsonRequest<AllTopicsInfo>(
@@ -280,15 +275,6 @@ public class CommunicationManager {
 
         String url = STTKeys.ALL_USERS;   // + "/" + PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
 
-        try {
-            SharedPreferences sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-            if (!TextUtils.isEmpty(sp.getString(STTKeys.USERDEFINED_BASE_HOST,""))){
-                url = url.replace("sttarter.com",sp.getString(STTKeys.USERDEFINED_BASE_HOST,""));
-            }
-        } catch (STTarterManager.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
-
         Log.d(TAG, "AllUserss url - " + url);
 
         GsonRequest<UserList> myReq = new GsonRequest<UserList>(
@@ -330,6 +316,88 @@ public class CommunicationManager {
                         }
                     };
                     insertThread.start();
+
+                } catch (SQLiteConstraintException e) {
+                    e.printStackTrace();
+                }
+
+                // store the subscribed topics as a string in shared preferences
+                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                /*PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
+                PreferenceHelper.getSharedPreferenceEditor().commit();*/
+                //}
+
+                //getMyTopics();
+            }
+        };
+    }
+
+
+    public void createGroup(String groupName, String users, STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("group_id",groupName);
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", groupName);
+            jsonObject.put("type", "group");
+            params.put("meta",jsonObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        params.put("is_public","true");
+
+        Iterator it = params.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry pairs = (Map.Entry)it.next();
+            Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
+        }
+
+        String url = STTKeys.GROUP + "/" ;//+ PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
+
+        GsonRequest<CreateGroupResponse> myReq = new GsonRequest<CreateGroupResponse>(
+                url,
+                CreateGroupResponse.class,
+                getHeaders(),
+                createGroupUsersSuccessListener(sttSuccessListener,users,getErrorListener),
+                getErrorListener,
+                Request.Method.POST, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+
+    }
+
+    private Response.Listener<CreateGroupResponse> createGroupUsersSuccessListener(final STTSuccessListener sttSuccessListener, final String users, final Response.ErrorListener getErrorListener) {
+
+        return new Response.Listener<CreateGroupResponse>() {
+            @Override
+            public void onResponse(final CreateGroupResponse response) {
+
+                try {
+                    Thread insertThread = new Thread() {
+                        public void run() {
+                            STTProviderHelper ph = new STTProviderHelper();
+                            ph.insertTopic(response.getTopic(),false);
+                        }
+                    };
+                    insertThread.start();
+
+                    String[] usersList = users.split(",");
+
+                    if (usersList.length>0) {
+                        subscribeTopic(response.getTopic().getGroup_id(), STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
+                        for (int i = 0; i < usersList.length; i++) {
+                            subscribeTopic(response.getTopic().getGroup_id(), usersList[i], sttSuccessListener, getErrorListener);
+                        }
+                    }
+                    else {
+                        subscribeTopic(response.getTopic().getGroup_id(), STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
+                    }
 
                 } catch (SQLiteConstraintException e) {
                     e.printStackTrace();
@@ -587,37 +655,28 @@ public class CommunicationManager {
         };
     }*/
 
-    public void subscribeTopic(String topicName, String userID) {
+    public void subscribeTopic(String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("topic", topicName);
         params.put("user", userID);
 
         Iterator it = params.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry pairs = (Map.Entry)it.next();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
             Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
         }
 
         String url = STTKeys.SUB;
 
-        try {
-            SharedPreferences sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-            if (!TextUtils.isEmpty(sp.getString(STTKeys.USERDEFINED_BASE_HOST,""))){
-                url = url.replace("sttarter.com",sp.getString(STTKeys.USERDEFINED_BASE_HOST,""));
-            }
-        } catch (STTarterManager.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
-
         Log.d(TAG, "subscribe url - " + url);
 
-        GsonRequest<SubscribeInfo> myReq = new GsonRequest<SubscribeInfo>(
+        GsonRequest<STTResponse> myReq = new GsonRequest<STTResponse>(
                 url,
-                SubscribeInfo.class,
+                STTResponse.class,
                 getHeaders(),
-                subscribeSuccessListener(),
-                RequestQueueHelper.responseErrorListener(),
+                subscribeSuccessListener(sttSuccessListener),
+                errorListener,
                 Request.Method.POST, params);
 
         // set this to be executed before any other rquesst in queue
@@ -625,12 +684,13 @@ public class CommunicationManager {
         RequestQueueHelper.addToRequestQueue(myReq);
     }
 
-    private Response.Listener<SubscribeInfo> subscribeSuccessListener() {
+    private Response.Listener<STTResponse> subscribeSuccessListener(final STTSuccessListener sttSuccessListener) {
 
-        return new Response.Listener<SubscribeInfo>() {
+        return new Response.Listener<STTResponse>() {
             @Override
-            public void onResponse(SubscribeInfo response) {
+            public void onResponse(STTResponse response) {
                 Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
+                sttSuccessListener.Response(response);
             }
         };
     }

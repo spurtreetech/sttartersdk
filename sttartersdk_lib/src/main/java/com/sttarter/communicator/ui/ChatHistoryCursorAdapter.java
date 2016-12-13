@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.sttarter.R;
-import com.sttarter.init.STTarterManager;
 import com.sttarter.communicator.models.Group;
 import com.sttarter.communicator.models.GroupMeta;
-import com.sttarter.helper.utils.DateTimeHelper;
 import com.sttarter.helper.uitools.CircularNetworkImageView;
+import com.sttarter.helper.utils.DateTimeHelper;
+import com.sttarter.init.STTarterManager;
 import com.sttarter.provider.STTProviderHelper;
 import com.sttarter.provider.messages.MessagesCursor;
 import com.sttarter.provider.topics.TopicsColumns;
@@ -81,7 +81,7 @@ public class ChatHistoryCursorAdapter extends CursorRecyclerAdapter<ChatHistoryC
         } else {
             //holder.imageViewGroupIcon.setImageResource(R.mipmap.ic_launcher);
         }
-        holder.textViewGroupName.setText(holder.tm.getName());
+        holder.textViewGroupName.setText(cursor.getString(cursor.getColumnIndex(TopicsColumns.TOPIC_NAME))/*holder.tm.getName()*/);
         holder.topicList.setTag(jsonTopic);
         //holder.latestMsgTextView.setText();
         MessagesCursor mc = ph.getLastMessageForTopic(cursor.getString(cursor.getColumnIndex(TopicsColumns.TOPIC_NAME)));

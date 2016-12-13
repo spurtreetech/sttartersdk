@@ -19,17 +19,17 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.sttarter.common.utils.GsonRequest;
-import com.sttarter.common.utils.STTarterConstants;
-import com.sttarter.init.Connection.ConnectionStatus;
 import com.sttarter.common.models.User;
 import com.sttarter.common.responses.AppAuthResponse;
 import com.sttarter.common.responses.STTResponse;
 import com.sttarter.common.responses.SignUpResponse;
+import com.sttarter.common.utils.GsonRequest;
+import com.sttarter.common.utils.STTarterConstants;
 import com.sttarter.communicator.CommunicationManager;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.helper.uitools.LruBitmapCache;
 import com.sttarter.helper.utils.NotificationHelperListener;
+import com.sttarter.init.Connection.ConnectionStatus;
 import com.sttarter.provider.STTProviderHelper;
 import com.sttarter.referral.ReferralManager;
 
@@ -67,7 +67,7 @@ public class STTarterManager {
     SharedPreferences sp;
     SharedPreferences.Editor spEditor;
     private MqttAndroidClient client;
-    private MqttConnectOptions  conOpt;
+    private MqttConnectOptions conOpt;
 
 
     public static final String TAG = STTarterManager.class.getSimpleName();
@@ -168,6 +168,10 @@ public class STTarterManager {
         context.startService(new Intent(context, MqttService.class));
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     /**
      * @param applicationContext context of the Application
      */
@@ -188,7 +192,7 @@ public class STTarterManager {
 
     }
 
-    public void login(Context context, String username, String password, STTSuccessListener STTSuccessListener, Response.ErrorListener getLoginResponseListener) {
+    public void loginwithAccount(Context context, String username, String password, STTSuccessListener STTSuccessListener, Response.ErrorListener getLoginResponseListener) {
         String url = STTKeys.LOGIN;
         Log.d(TAG, "Login url - " + url);
 
@@ -242,6 +246,49 @@ public class STTarterManager {
         };
     }
 
+    public void loginUserRequestForOTP(Context applicationContext, STTSuccessListener sttSuccessListener, Response.ErrorListener loginResponseListener, String mobileStr, String orgStr) {
+
+        this.context = applicationContext;
+        HashMap params = new HashMap();
+        params.put("mobile", mobileStr);
+        params.put("org_id", orgStr);
+        String url = STTKeys.GET_OTP;
+        GsonRequest myReq = new GsonRequest(url, User.class, RequestQueueHelper.getHeaders(), getLoginSuccessListener(context, sttSuccessListener), loginResponseListener, Request.Method.POST, params);
+        short socketTimeout = 30000;
+        DefaultRetryPolicy policy = new DefaultRetryPolicy(socketTimeout, 0, 1.0F);
+        myReq.setRetryPolicy(policy);
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
+    public void confirmOTPWithServer(Context applicationContext, String otpCode, STTSuccessListener sttSuccessListener, Response.ErrorListener getOTPResponseListener, String mobileStr, String orgStr) {
+        this.context = applicationContext;
+        HashMap params = new HashMap();
+        params.put("mobile", mobileStr);
+        params.put("otp", otpCode);
+        params.put("org_id", orgStr);
+        String url = STTKeys.OTP_LOGIN;
+        GsonRequest myReq = new GsonRequest(url, User.class, RequestQueueHelper.getHeaders(), getLoginSuccessListener(context, sttSuccessListener), getOTPResponseListener, Request.Method.POST, params);
+        short socketTimeout = 30000;
+        DefaultRetryPolicy policy = new DefaultRetryPolicy(2 * socketTimeout, 0, 1.0F);
+        myReq.setRetryPolicy(policy);
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
+    public void quickLogin(Context applicationContext, Response.Listener<STTResponse> getSuccessListener, Response.ErrorListener getErrorListener, String name, String mobileStr, String emailStr, String orgStr) {
+        this.context = applicationContext;
+        HashMap params = new HashMap();
+        params.put("name", name);
+        params.put("mobile", mobileStr);
+        params.put("email", emailStr);
+        params.put("org_id", orgStr);
+        String url = STTKeys.QUICK_LOGIN;
+        GsonRequest myReq = new GsonRequest(url, STTResponse.class, RequestQueueHelper.getHeaders(), getSuccessListener, getErrorListener, Request.Method.POST, params);
+        short socketTimeout = 30000;
+        DefaultRetryPolicy policy = new DefaultRetryPolicy(2 * socketTimeout, 0, 1.0F);
+        myReq.setRetryPolicy(policy);
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
     private Response.Listener<AppAuthResponse> getAuthSuccessListener(final Context applicationContext, final STTSuccessListener STTSuccessListener) {
 
         return new Response.Listener<AppAuthResponse>() {
@@ -268,7 +315,7 @@ public class STTarterManager {
 
 
 
-    public void signUp(Context context, User signUpModel,String referralCode, STTSuccessListener STTSuccessListener, Response.ErrorListener getSignUpErrorListener) {
+    public void signUp(Context context, User signUpModel, String referralCode, STTSuccessListener STTSuccessListener, Response.ErrorListener getSignUpErrorListener) {
         String url = STTKeys.SIGNUP;
         Log.d(TAG, "SignUp url - " + url);
 
@@ -616,7 +663,13 @@ public class STTarterManager {
     }
 
     public String getUsername(){
-        return PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"");
+        try {
+            return PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public String getClientId() {
@@ -645,7 +698,7 @@ public class STTarterManager {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
-        MqttConnectOptions  conOpt = new MqttConnectOptions();
+        MqttConnectOptions conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
         Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
@@ -778,16 +831,16 @@ public class STTarterManager {
         //this.client = client;
         this.conOpt = conOpt;
         if (doConnect) {
-            Thread t = new Thread(){
-                public void run(){
-                    try {
-                        STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
-                    } catch (MqttException e) {
-                        e.printStackTrace();
+                Thread t = new Thread(){
+                    public void run(){
+                        try {
+                            STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            };
-            t.start();
+                };
+                t.start();
         }
 
         /*
@@ -883,7 +936,7 @@ public class STTarterManager {
         this.context = context;
         try {
             if (client!=null && client.isConnected())
-                client.disconnect();
+            client.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
         }

@@ -28,6 +28,9 @@ public class STTKeys {
 
     public static String AUTH = HOST + "auth";
     public static String LOGIN = HOST + "login";
+    public static String GET_OTP = HOST + "/mobile/getotp";
+    public static String OTP_LOGIN = HOST + "/mobile/otplogin";
+    public static String QUICK_LOGIN = HOST + "/mobile/quicklogin";
     public static String INIT = HOST + "init";
     public static String SIGNUP = HOST + "app/user";
     public static String GET_TOPICS = BASE_URL + "gettopics";
@@ -36,8 +39,9 @@ public class STTKeys {
     public static String REGISTER = HOST + "app/client/register";
     public static String UNREGISTER = HOST + "app/client/unregister";
     public static String MY_TOPICS = BASE_URL + "mytopics";
-    public static String SUB = BASE_URL + "topic/join";
-    public static String UNSUB = BASE_URL + "topic/leave";
+    public static String GROUP = BASE_URL + "group";
+    public static String SUB = BASE_URL + "group/join";
+    public static String UNSUB = BASE_URL + "group/leave";
     public static String PUBLISH = BASE_URL + "pub";
     public static String INITCHAT = BASE_URL + "initchat";
     public static String INITGROUPCHAT = BASE_URL + "initgroupchat";
