@@ -35,7 +35,7 @@ public class STTCallbackHandler implements MqttCallback {
      * @param context The application's context
      * @param clientHandle The handle to a {@link Connection} object
      */
-    BroadcastHelper broadCastHelper;
+    BroadcastHelper  broadCastHelper;
     NotificationHelperListener notificationHelperListener;
 
     public STTCallbackHandler(Context context, String clientHandle)

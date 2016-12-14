@@ -74,7 +74,7 @@ public class ActionListener implements IMqttActionListener {
    *            Used for as arguments for string formating
    */
   public ActionListener(Context context, Action action,
-                        String clientHandle, String... additionalArgs) {
+      String clientHandle, String... additionalArgs) {
     this.context = context;
     this.action = action;
     this.clientHandle = clientHandle;
@@ -216,7 +216,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * The action associated with the object was a failure
-   *
+   * 
    * @param token
    *            This argument is not used
    * @param exception
@@ -243,7 +243,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * A publish action was unsuccessful, notify user and update client history
-   *
+   * 
    * @param exception
    *            This argument is not used
    */

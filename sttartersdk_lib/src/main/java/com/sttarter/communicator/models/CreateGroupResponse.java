@@ -6,7 +6,7 @@ import com.sttarter.common.responses.STTResponse;
  * Created by Shahbaz on 12-12-2016.
  */
 
-public class CreateGroupResponse extends STTResponse {
+public class CreateGroupResponse extends STTResponse{
 
     GroupStringMeta topic;
 

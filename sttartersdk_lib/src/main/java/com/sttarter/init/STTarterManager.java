@@ -19,19 +19,20 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.sttarter.common.utils.GsonRequest;
+import com.sttarter.common.utils.STTarterConstants;
+import com.sttarter.init.Connection.ConnectionStatus;
 import com.sttarter.common.models.User;
 import com.sttarter.common.responses.AppAuthResponse;
 import com.sttarter.common.responses.STTResponse;
 import com.sttarter.common.responses.SignUpResponse;
-import com.sttarter.common.utils.GsonRequest;
-import com.sttarter.common.utils.STTarterConstants;
 import com.sttarter.communicator.CommunicationManager;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.helper.uitools.LruBitmapCache;
 import com.sttarter.helper.utils.NotificationHelperListener;
-import com.sttarter.init.Connection.ConnectionStatus;
 import com.sttarter.provider.STTProviderHelper;
 import com.sttarter.referral.ReferralManager;
+import com.sttarter.referral.interfaces.STTReferralInterface;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.android.service.MqttService;
@@ -67,7 +68,7 @@ public class STTarterManager {
     SharedPreferences sp;
     SharedPreferences.Editor spEditor;
     private MqttAndroidClient client;
-    private MqttConnectOptions conOpt;
+    private MqttConnectOptions  conOpt;
 
 
     public static final String TAG = STTarterManager.class.getSimpleName();
@@ -315,7 +316,7 @@ public class STTarterManager {
 
 
 
-    public void signUp(Context context, User signUpModel, String referralCode, STTSuccessListener STTSuccessListener, Response.ErrorListener getSignUpErrorListener) {
+    public void signUp(Context context, User signUpModel,String referralCode, STTSuccessListener STTSuccessListener, Response.ErrorListener getSignUpErrorListener) {
         String url = STTKeys.SIGNUP;
         Log.d(TAG, "SignUp url - " + url);
 
@@ -698,7 +699,7 @@ public class STTarterManager {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
-        MqttConnectOptions conOpt = new MqttConnectOptions();
+        MqttConnectOptions  conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
         Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());

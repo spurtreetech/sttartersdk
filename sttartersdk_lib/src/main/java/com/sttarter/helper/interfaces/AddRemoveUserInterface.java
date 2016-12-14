@@ -1,5 +1,7 @@
 package com.sttarter.helper.interfaces;
 
+import com.sttarter.common.models.User;
+
 /**
  * Created by Shahbaz on 09-12-2016.
  */

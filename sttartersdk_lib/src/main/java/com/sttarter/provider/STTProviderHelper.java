@@ -2,15 +2,17 @@ package com.sttarter.provider;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.sttarter.common.models.PayloadData;
-import com.sttarter.common.models.User;
-import com.sttarter.communicator.models.Group;
+import com.sttarter.communicator.models.GroupStringMeta;
+import com.sttarter.init.STTarterManager;
 import com.sttarter.helper.hash.HashGenerationException;
 import com.sttarter.helper.hash.HashGeneratorUtils;
-import com.sttarter.init.STTarterManager;
+import com.sttarter.common.models.PayloadData;
+import com.sttarter.communicator.models.Group;
+import com.sttarter.common.models.User;
 import com.sttarter.provider.messages.MessagesContentValues;
 import com.sttarter.provider.messages.MessagesCursor;
 import com.sttarter.provider.messages.MessagesSelection;

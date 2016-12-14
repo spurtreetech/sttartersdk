@@ -6,6 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,8 +17,10 @@ import com.sttarter.common.models.User;
 import com.sttarter.helper.interfaces.AddRemoveUserInterface;
 import com.sttarter.helper.uitools.CircularNetworkImageView;
 import com.sttarter.init.STTarterManager;
+import com.sttarter.provider.topics.TopicsColumns;
 import com.sttarter.provider.users.UsersColumns;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

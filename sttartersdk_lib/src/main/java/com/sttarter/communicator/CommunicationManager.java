@@ -11,19 +11,20 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.google.gson.Gson;
-import com.sttarter.common.models.AuthInfo;
-import com.sttarter.common.models.UserList;
-import com.sttarter.common.responses.STTResponse;
-import com.sttarter.common.utils.GsonRequest;
-import com.sttarter.communicator.models.AllTopicsInfo;
-import com.sttarter.communicator.models.Group;
-import com.sttarter.communicator.models.MyTopicsInfo;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.init.Connections;
+import com.sttarter.common.utils.GsonRequest;
 import com.sttarter.init.PreferenceHelper;
 import com.sttarter.init.RequestQueueHelper;
 import com.sttarter.init.STTKeys;
 import com.sttarter.init.STTarterManager;
+import com.sttarter.communicator.models.AllTopicsInfo;
+import com.sttarter.common.models.UserList;
+import com.sttarter.common.models.AuthInfo;
+import com.sttarter.common.responses.STTResponse;
+import com.sttarter.communicator.models.MyTopicsInfo;
+import com.sttarter.communicator.models.SubscribeInfo;
+import com.sttarter.communicator.models.Group;
 import com.sttarter.provider.STTProviderHelper;
 
 import org.json.JSONObject;
@@ -330,7 +331,7 @@ public class CommunicationManager {
     }
 
 
-    public void createGroup(String groupName, String users, STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
+    public void createGroup(String groupName,String users,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("group_id",groupName);
@@ -650,7 +651,7 @@ public class CommunicationManager {
         };
     }*/
 
-    private void subscribeTopicWithoutCallback(boolean callback, String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener){
+    private void subscribeTopicWithoutCallback(boolean callback,String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener){
         Map<String, String> params = new HashMap<String, String>();
         params.put("group_id", topicName);
         params.put("user", userID);
@@ -695,7 +696,7 @@ public class CommunicationManager {
     }
 
 
-    public void leaveGroup(String topicName, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
+    public void leaveGroup(String topicName,STTSuccessListener sttSuccessListener,Response.ErrorListener errorListener) {
         Map<String, String> params = new HashMap<String, String>();
         String[] topic = topicName.split("-group-");
         params.put("group_id", topic[topic.length-1]);

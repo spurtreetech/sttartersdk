@@ -64,8 +64,8 @@ public class UsersColumns implements BaseColumns {
         return false;
     }
 
-
-    public static User completeRow(Cursor cursor)
+        
+public static User completeRow(Cursor cursor)
     {
         User user = new User();
         try

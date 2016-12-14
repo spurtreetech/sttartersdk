@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.sttarter.R;
+import com.sttarter.init.STTarterManager;
 import com.sttarter.communicator.models.Group;
 import com.sttarter.communicator.models.GroupMeta;
-import com.sttarter.helper.uitools.CircularNetworkImageView;
 import com.sttarter.helper.utils.DateTimeHelper;
-import com.sttarter.init.STTarterManager;
+import com.sttarter.helper.uitools.CircularNetworkImageView;
 import com.sttarter.provider.STTProviderHelper;
 import com.sttarter.provider.messages.MessagesCursor;
 import com.sttarter.provider.topics.TopicsColumns;
