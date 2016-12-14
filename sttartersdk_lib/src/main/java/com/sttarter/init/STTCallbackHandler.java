@@ -35,7 +35,7 @@ public class STTCallbackHandler implements MqttCallback {
      * @param context The application's context
      * @param clientHandle The handle to a {@link Connection} object
      */
-    BroadcastHelper  broadCastHelper;
+    BroadcastHelper broadCastHelper;
     NotificationHelperListener notificationHelperListener;
 
     public STTCallbackHandler(Context context, String clientHandle)
@@ -194,7 +194,7 @@ public class STTCallbackHandler implements MqttCallback {
 
                 Log.i(this.getClass().getSimpleName(), "Message not found and Message not by sender");
 
-                //if(STTarterManager.getInstance().isApplicationInBackground()) {
+                if(STTarterManager.getInstance().isApplicationInBackground()) {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, false);
@@ -218,12 +218,12 @@ public class STTCallbackHandler implements MqttCallback {
                         this.notificationHelperListener.displayNotification(notificationString);
                         //NotificationHelper.displayNotification(notificationString);
                     }
-                /*} else {
+                } else {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, true);
                     ph.updateTopicActiveTime(pd);
-                }*/
+                }
             }
 
         }

@@ -74,7 +74,7 @@ public class ActionListener implements IMqttActionListener {
    *            Used for as arguments for string formating
    */
   public ActionListener(Context context, Action action,
-      String clientHandle, String... additionalArgs) {
+                        String clientHandle, String... additionalArgs) {
     this.context = context;
     this.action = action;
     this.clientHandle = clientHandle;
@@ -211,12 +211,12 @@ public class ActionListener implements IMqttActionListener {
     //Log.d("ActionListener", "unsubscribe - " + additionalArgs[0]);
     // TODO call the unsubscribe function with the topic name
     //String topic[] = additionalArgs[1].split(";");
-    //gr.unsubscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
+    //gr.leaveGroup(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
   }
 
   /**
    * The action associated with the object was a failure
-   * 
+   *
    * @param token
    *            This argument is not used
    * @param exception
@@ -243,7 +243,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * A publish action was unsuccessful, notify user and update client history
-   * 
+   *
    * @param exception
    *            This argument is not used
    */

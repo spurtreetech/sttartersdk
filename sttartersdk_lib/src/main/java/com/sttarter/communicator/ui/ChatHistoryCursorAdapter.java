@@ -81,7 +81,7 @@ public class ChatHistoryCursorAdapter extends CursorRecyclerAdapter<ChatHistoryC
         } else {
             //holder.imageViewGroupIcon.setImageResource(R.mipmap.ic_launcher);
         }
-        holder.textViewGroupName.setText(cursor.getString(cursor.getColumnIndex(TopicsColumns.TOPIC_NAME))/*holder.tm.getName()*/);
+        holder.textViewGroupName.setText(holder.tm.getName());
         holder.topicList.setTag(jsonTopic);
         //holder.latestMsgTextView.setText();
         MessagesCursor mc = ph.getLastMessageForTopic(cursor.getString(cursor.getColumnIndex(TopicsColumns.TOPIC_NAME)));

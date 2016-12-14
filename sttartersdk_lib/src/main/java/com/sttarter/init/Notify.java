@@ -19,8 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat.Builder;
 
-import com.sttarter.helper.utils.BuildUtils;
-
 import java.util.Calendar;
 
 /**
@@ -72,11 +70,11 @@ public class Notify {
 
     Notification notification = notificationCompat.build();
     //display the notification
-    if (((Boolean)BuildUtils.getBuildConfigValue(context, "DEBUG"))) {
+    /*if (((Boolean)BuildUtils.getBuildConfigValue(context, "DEBUG"))) {
         // mNotificationManager.notify(MessageID, notification);
         // uncomment below code to receive multiple notifications
         //MessageID++;
-    }
+    }*/
   }
 
   /**

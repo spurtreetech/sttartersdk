@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import com.sttarter.common.models.PayloadData;
 import com.sttarter.common.models.User;
 import com.sttarter.communicator.models.Group;
-import com.sttarter.communicator.models.GroupStringMeta;
 import com.sttarter.helper.hash.HashGenerationException;
 import com.sttarter.helper.hash.HashGeneratorUtils;
 import com.sttarter.init.STTarterManager;
@@ -108,80 +107,6 @@ public class STTProviderHelper {
             }
 
         }
-    }
-
-    public synchronized void insertTopic(GroupStringMeta data, boolean subscribedTopics) {
-
-        //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
-
-        ArrayList<TopicsContentValues> tcv = new ArrayList<>();
-        int count = 0;
-
-            try {
-
-                TopicsSelection where = new TopicsSelection();
-                where.topicName(data.getTopic());
-
-                // Check if current topic is already inserted
-                Cursor c = STTarterManager.getInstance().getContext().getContentResolver().query(TopicsColumns.CONTENT_URI, new String[]{TopicsColumns._ID}, where.sel(), where.args(), null);
-                TopicsContentValues temp = new TopicsContentValues();
-
-                // If already present then update else insert
-                if(c!=null && c.getCount()>0) {
-
-                    // update subscribed status of topics from "mytopics" API
-                    if(subscribedTopics==true) {
-                        temp.putTopicIsSubscribed(subscribedTopics);
-                        temp.putTopicIsPublic((data.getIs_public() == 1) ? true : false);
-
-                        Gson gson = new Gson();
-                        String sttJson = gson.toJson(data.getMeta());
-                        String groupMembersJson = gson.toJson(data.getGroup_members());
-
-                        temp.putTopicMeta(sttJson);
-                        temp.putTopicType(data.getType());
-                        temp.putTopicGroupMembers(groupMembersJson);
-                        temp.update(STTarterManager.getInstance().getContext().getContentResolver(), where);
-                    }
-
-                } else {
-
-                    temp.putTopicName(data.getTopic());
-                    temp.putTopicType(data.getType());
-                    temp.putTopicIsPublic((data.getIs_public() == 1) ? true : false);
-                    temp.putTopicUpdatedUnixTimestamp(1);
-                    Gson gson = new Gson();
-                    String sttJson = gson.toJson(data.getMeta());
-                    String groupMembersJson = gson.toJson(data.getGroup_members());
-
-                    temp.putTopicMeta(sttJson);
-                    temp.putTopicGroupMembers(groupMembersJson);
-                    if(subscribedTopics==true)
-                        temp.putTopicIsSubscribed(subscribedTopics);
-
-                    tcv.add(temp);
-                    count++;
-
-                }
-
-
-            } catch (STTarterManager.ContextNotInitializedException e) {
-                e.printStackTrace();
-            }
-
-            // Bulk insert all rows that do not exist
-            if(count>0) {
-                ContentValues[] cv = new ContentValues[count];
-                count = 0;
-                for (TopicsContentValues tempTcv : tcv) {
-                    cv[count] = tempTcv.values();
-                }
-                try {
-                    STTarterManager.getInstance().getContext().getContentResolver().bulkInsert(TopicsColumns.CONTENT_URI, cv);
-                } catch (STTarterManager.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
-            }
     }
 
     public synchronized void insertMessage(PayloadData pd, boolean is_sender, boolean is_delivered) {
@@ -436,6 +361,17 @@ public class STTProviderHelper {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public void deleteAllTopics() {
+            TopicsSelection whereTopics = new TopicsSelection();
+            whereTopics.addRaw("1");
+            Log.d(getClass().getSimpleName(), "Deleted topics from SQLite DB");
+        try {
+            whereTopics.delete(STTarterManager.getInstance().getContext());
+        } catch (STTarterManager.ContextNotInitializedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void emptyAllTable() {

@@ -16,10 +16,8 @@ import com.sttarter.common.models.UserList;
 import com.sttarter.common.responses.STTResponse;
 import com.sttarter.common.utils.GsonRequest;
 import com.sttarter.communicator.models.AllTopicsInfo;
-import com.sttarter.communicator.models.CreateGroupResponse;
 import com.sttarter.communicator.models.Group;
 import com.sttarter.communicator.models.MyTopicsInfo;
-import com.sttarter.communicator.models.SubscribeInfo;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.init.Connections;
 import com.sttarter.init.PreferenceHelper;
@@ -65,8 +63,7 @@ public class CommunicationManager {
         //STTarterManager.getInstance().unsubscribe(topics);
 
         // TODO get all topics from server and subscribe to all of them
-        getMyTopics();
-        //getAllTopics();
+        getAllTopics();
 
 
     }
@@ -155,6 +152,7 @@ public class CommunicationManager {
                     Thread insertThread = new Thread() {
                         public void run() {
                             STTProviderHelper ph = new STTProviderHelper();
+                            //ph.deleteAllTopics();
                             ph.insertTopics(myTopicsResponse.getTopics(), true);
                         }
                     };
@@ -168,8 +166,7 @@ public class CommunicationManager {
                 PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();
                 //}
-
-                getAllTopics();
+                getAllUsers();
 
             }
         };
@@ -256,8 +253,8 @@ public class CommunicationManager {
                 PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();
                 //}
-                getAllUsers();
-                //getMyTopics();
+
+                getMyTopics();
             }
         };
     }
@@ -341,6 +338,7 @@ public class CommunicationManager {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", groupName);
             jsonObject.put("type", "group");
+            jsonObject.put("allow_reply", true);
             params.put("meta",jsonObject.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -356,11 +354,11 @@ public class CommunicationManager {
 
         String url = STTKeys.GROUP + "/" ;//+ PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
 
-        GsonRequest<CreateGroupResponse> myReq = new GsonRequest<CreateGroupResponse>(
+        GsonRequest<STTResponse> myReq = new GsonRequest<STTResponse>(
                 url,
-                CreateGroupResponse.class,
+                STTResponse.class,
                 getHeaders(),
-                createGroupUsersSuccessListener(sttSuccessListener,users,getErrorListener),
+                createGroupUsersSuccessListener(sttSuccessListener,groupName,users,getErrorListener),
                 getErrorListener,
                 Request.Method.POST, params);
 
@@ -372,35 +370,32 @@ public class CommunicationManager {
 
     }
 
-    private Response.Listener<CreateGroupResponse> createGroupUsersSuccessListener(final STTSuccessListener sttSuccessListener, final String users, final Response.ErrorListener getErrorListener) {
+    private Response.Listener<STTResponse> createGroupUsersSuccessListener(final STTSuccessListener sttSuccessListener, final String groupName, final String users, final Response.ErrorListener getErrorListener) {
 
-        return new Response.Listener<CreateGroupResponse>() {
+        return new Response.Listener<STTResponse>() {
             @Override
-            public void onResponse(final CreateGroupResponse response) {
+            public void onResponse(final STTResponse response) {
 
                 try {
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            ph.insertTopic(response.getTopic(),false);
-                        }
-                    };
-                    insertThread.start();
 
                     String[] usersList = users.split(",");
 
-                    if (usersList.length>0) {
-                        subscribeTopic(response.getTopic().getGroup_id(), STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
+                    if (usersList.length>0 && !TextUtils.isEmpty(usersList[0])) {
+                        subscribeTopicWithoutCallback(false,groupName, STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
                         for (int i = 0; i < usersList.length; i++) {
-                            subscribeTopic(response.getTopic().getGroup_id(), usersList[i], sttSuccessListener, getErrorListener);
+                            subscribeTopicWithoutCallback(false,groupName, usersList[i], sttSuccessListener, getErrorListener);
                         }
                     }
                     else {
-                        subscribeTopic(response.getTopic().getGroup_id(), STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
+                        subscribeTopicWithoutCallback(false,groupName, STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
                     }
 
                 } catch (SQLiteConstraintException e) {
                     e.printStackTrace();
+                }
+                finally {
+                    getMyTopics();
+                    sttSuccessListener.Response(response);
                 }
 
                 // store the subscribed topics as a string in shared preferences
@@ -655,10 +650,9 @@ public class CommunicationManager {
         };
     }*/
 
-    public void subscribeTopic(String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
-
+    private void subscribeTopicWithoutCallback(boolean callback, String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener){
         Map<String, String> params = new HashMap<String, String>();
-        params.put("topic", topicName);
+        params.put("group_id", topicName);
         params.put("user", userID);
 
         Iterator it = params.entrySet().iterator();
@@ -675,7 +669,7 @@ public class CommunicationManager {
                 url,
                 STTResponse.class,
                 getHeaders(),
-                subscribeSuccessListener(sttSuccessListener),
+                subscribeSuccessListener(sttSuccessListener,callback),
                 errorListener,
                 Request.Method.POST, params);
 
@@ -684,21 +678,27 @@ public class CommunicationManager {
         RequestQueueHelper.addToRequestQueue(myReq);
     }
 
-    private Response.Listener<STTResponse> subscribeSuccessListener(final STTSuccessListener sttSuccessListener) {
+    public void subscribeTopic(String topicName, String userID, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
+        subscribeTopicWithoutCallback(true,topicName,userID,sttSuccessListener,errorListener);
+    }
+
+    private Response.Listener<STTResponse> subscribeSuccessListener(final STTSuccessListener sttSuccessListener, final boolean callBack) {
 
         return new Response.Listener<STTResponse>() {
             @Override
             public void onResponse(STTResponse response) {
                 Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
+                if (callBack)
                 sttSuccessListener.Response(response);
             }
         };
     }
 
 
-    public void unsubscribeTopic(String topicName) {
+    public void leaveGroup(String topicName, STTSuccessListener sttSuccessListener, Response.ErrorListener errorListener) {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("topic", topicName);
+        String[] topic = topicName.split("-group-");
+        params.put("group_id", topic[topic.length-1]);
         params.put("user", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
 
         Iterator it = params.entrySet().iterator();
@@ -720,30 +720,36 @@ public class CommunicationManager {
 
         Log.d("Unsub Url",url);
 
-        GsonRequest<SubscribeInfo> myReq = new GsonRequest<SubscribeInfo>(
+        GsonRequest<STTResponse> myReq = new GsonRequest<STTResponse>(
                 url,
-                SubscribeInfo.class,
+                STTResponse.class,
                 getHeaders(),
-                unsubscribeSuccessListener(topicName),
-                RequestQueueHelper.responseErrorListener(),
-                Request.Method.POST, params);
+                unsubscribeSuccessListener(sttSuccessListener,topicName),
+                errorListener,
+                Request.Method.DELETE, params);
 
         // set this to be executed before any other rquesst in queue
         //myReq.setSequence(0);
         RequestQueueHelper.addToRequestQueue(myReq);
     }
 
-    private Response.Listener<SubscribeInfo> unsubscribeSuccessListener(final String topicName) {
+    private Response.Listener<STTResponse> unsubscribeSuccessListener(final STTSuccessListener sttSuccessListener, final String topicName) {
 
-        return new Response.Listener<SubscribeInfo>() {
+        return new Response.Listener<STTResponse>() {
             @Override
-            public void onResponse(SubscribeInfo response) {
+            public void onResponse(STTResponse response) {
                 Log.d("STTGeneralRoutines", "UNSUBSCRIBED - " + response.getStatus());
                 STTProviderHelper ph = new STTProviderHelper();
                 ph.updateTopicSubscribe(topicName, 0);
                 STTarterManager.getInstance().unsubscribe(topicName);
+                sttSuccessListener.Response(response);
             }
         };
+    }
+
+    public void updateRead(String topic){
+        STTProviderHelper sttProviderHelper = new STTProviderHelper();
+        sttProviderHelper.updateMessageRead(topic);
     }
 
     protected Map<String, String>  getHeaders() {
