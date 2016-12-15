@@ -119,7 +119,13 @@ public class CommunicationManager {
                     //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                     Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
                     if(clientConnected) {
-                        STTarterManager.getInstance().subscribe(tempGroup.getTopic());
+                        if (tempGroup.getTopic()!=null && !TextUtils.isEmpty(tempGroup.getTopic())) {
+                            try {
+                                STTarterManager.getInstance().subscribe(tempGroup.getTopic());
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     if(!tempGroup.getType().equals("master")) {

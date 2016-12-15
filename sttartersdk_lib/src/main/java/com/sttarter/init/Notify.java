@@ -57,18 +57,18 @@ public class Notify {
 
     //build the pending intent that will start the appropriate activity
     PendingIntent pendingIntent = PendingIntent.getActivity(context,
-        ActivityConstants.showHistory, intent, 0);
+            ActivityConstants.showHistory, intent, 0);
 
     //build the notification
     Builder notificationCompat = new Builder(context);
     notificationCompat.setAutoCancel(true)
-        .setContentTitle(contentTitle)
-        .setContentIntent(pendingIntent)
-        .setContentText(messageString)
-        .setTicker(ticker)
-        .setWhen(when)
-        .setGroup("com.spurtreetech.sttarter.lib.helper");
-       // .setSmallIcon(R.mipmap.autosense);
+            .setContentTitle(contentTitle)
+            .setContentIntent(pendingIntent)
+            .setContentText(messageString)
+            .setTicker(ticker)
+            .setWhen(when)
+            .setGroup("com.spurtreetech.sttarter.lib.helper");
+    // .setSmallIcon(R.mipmap.autosense);
 
     Notification notification = notificationCompat.build();
     //display the notification
@@ -86,11 +86,11 @@ public class Notify {
    * @param duration The amount of time for the toast to appear to the user
    */
   static void toast(Context context, CharSequence text, int duration) {
-      //Toast.makeText(context, "LibBuildConfig.DEBUG: " + ((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG")), duration).show();
-      //if (((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG"))) {
-          //Toast toast = Toast.makeText(context, text, duration);
-          //toast.show();
-      //}
+    //Toast.makeText(context, "LibBuildConfig.DEBUG: " + ((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG")), duration).show();
+    //if (((Boolean)BuildUtils.getBuildConfigValue(context,"DEBUG"))) {
+    //Toast toast = Toast.makeText(context, text, duration);
+    //toast.show();
+    //}
   }
 
 }

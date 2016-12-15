@@ -178,8 +178,8 @@ public class STTProviderHelper {
                     temp.putUsersMobile((tempUser.getMobile()==null ? "":tempUser.getMobile()));
                     temp.putUsersAvatar((tempUser.getAvatar()==null ? "":tempUser.getAvatar()));
 
-                        Gson gson = new Gson();
-                        String sttJson = gson.toJson((tempUser.getMeta()==null ? "":tempUser.getMeta()));
+                    Gson gson = new Gson();
+                    String sttJson = gson.toJson((tempUser.getMeta()==null ? "":tempUser.getMeta()));
 
                     temp.putUsersMeta(sttJson);
                     temp.putUsersEmail((tempUser.getEmail()==null ? "":tempUser.getEmail()));
@@ -366,9 +366,9 @@ public class STTProviderHelper {
     }
 
     public void deleteAllTopics() {
-            TopicsSelection whereTopics = new TopicsSelection();
-            whereTopics.addRaw("1");
-            Log.d(getClass().getSimpleName(), "Deleted topics from SQLite DB");
+        TopicsSelection whereTopics = new TopicsSelection();
+        whereTopics.addRaw("1");
+        Log.d(getClass().getSimpleName(), "Deleted topics from SQLite DB");
         try {
             whereTopics.delete(STTarterManager.getInstance().getContext());
         } catch (STTarterManager.ContextNotInitializedException e) {

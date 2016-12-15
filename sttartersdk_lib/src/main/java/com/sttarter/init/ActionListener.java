@@ -33,7 +33,7 @@ public class ActionListener implements IMqttActionListener {
   /**
    * Actions that can be performed Asynchronously <strong>and</strong> associated with a
    * {@link ActionListener} object
-   * 
+   *
    */
   protected enum Action {
     /** Connect Action **/
@@ -62,7 +62,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * Creates a generic action listener for actions performed form any activity
-   * 
+   *
    * @param context
    *            The application context
    * @param action
@@ -74,7 +74,7 @@ public class ActionListener implements IMqttActionListener {
    *            Used for as arguments for string formating
    */
   public ActionListener(Context context, Action action,
-      String clientHandle, String... additionalArgs) {
+                        String clientHandle, String... additionalArgs) {
     this.context = context;
     this.action = action;
     this.clientHandle = clientHandle;
@@ -96,7 +96,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * The action associated with this listener has been successful.
-   * 
+   *
    * @param asyncActionToken
    *            This argument is not used
    */
@@ -188,8 +188,8 @@ public class ActionListener implements IMqttActionListener {
     Notify.toast(context, "Client Connected", Toast.LENGTH_SHORT);
 
     //if(!PreferenceHelper.getSharedPreference().getString(STTKeys.ALL_TOPICS_LIST,"").equals("")) {
-      CommunicationManager sttGeneralRoutines = new CommunicationManager();
-      sttGeneralRoutines.subscribeInitalize();
+    CommunicationManager sttGeneralRoutines = new CommunicationManager();
+    sttGeneralRoutines.subscribeInitalize();
     //}
 
 
@@ -216,7 +216,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * The action associated with the object was a failure
-   * 
+   *
    * @param token
    *            This argument is not used
    * @param exception
@@ -243,7 +243,7 @@ public class ActionListener implements IMqttActionListener {
 
   /**
    * A publish action was unsuccessful, notify user and update client history
-   * 
+   *
    * @param exception
    *            This argument is not used
    */
@@ -263,7 +263,7 @@ public class ActionListener implements IMqttActionListener {
   private void subscribe(Throwable exception) {
     Connection c = Connections.getInstance(context).getConnection(clientHandle);
     String action = context.getString(R.string.toast_sub_failed,
-        (Object[]) additionalArgs);
+            (Object[]) additionalArgs);
     c.addAction(action);
     Notify.toast(context, action, Toast.LENGTH_SHORT);
 

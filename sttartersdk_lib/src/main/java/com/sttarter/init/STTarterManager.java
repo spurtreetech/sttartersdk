@@ -832,16 +832,16 @@ public class STTarterManager {
         //this.client = client;
         this.conOpt = conOpt;
         if (doConnect) {
-                Thread t = new Thread(){
-                    public void run(){
-                        try {
-                            STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
+            Thread t = new Thread(){
+                public void run(){
+                    try {
+                        STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                };
-                t.start();
+                }
+            };
+            t.start();
         }
 
         /*
@@ -937,7 +937,7 @@ public class STTarterManager {
         this.context = context;
         try {
             if (client!=null && client.isConnected())
-            client.disconnect();
+                client.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
         }
