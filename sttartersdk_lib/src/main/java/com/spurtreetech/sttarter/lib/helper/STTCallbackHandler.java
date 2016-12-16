@@ -200,7 +200,7 @@ public class STTCallbackHandler implements MqttCallback {
                     ph.insertMessage(pd, false, false);
                     ph.updateTopicActiveTime(pd);
 
-                    String notificationString = PreferenceHelper.getSharedPreference().getString(Keys.NOTIFICATION_TOPICS,"");
+                    String notificationString = PreferenceHelper.getSharedPreference().getString(STTKeys.NOTIFICATION_TOPICS,"");
                     TopicsCursor tc = ph.getTopicData(pd.getPayload().getTopic());
 
                     if(tc.getCount()!=0) {
@@ -214,7 +214,7 @@ public class STTCallbackHandler implements MqttCallback {
                             notificationString += ", " + ((tm==null || tm.getName()==null || tm.getName().equals("")) ? "Buzz" : tm.getName());
                         }
 
-                        PreferenceHelper.getSharedPreferenceEditor().putString(Keys.NOTIFICATION_TOPICS, notificationString).commit();
+                        PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.NOTIFICATION_TOPICS, notificationString).commit();
                         this.notificationHelperListener.displayNotification(notificationString);
                         //NotificationHelper.displayNotification(notificationString);
                     }

@@ -117,20 +117,20 @@ public class STTarter {
         this.appSecret = appSecret;
         this.notificationHelperListener = notificationHelperListener;
 
-        sp = applicationContext.getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+        sp = applicationContext.getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
         spEditor = sp.edit();
 
         Log.d("STTarter", "init data: " + appId + ", " + appSecret + ", " + userID + ", " + userToken);
         // TODO save the appId in SharedPreference and use appId (and appKey) to build requests to the server
-        spEditor.putString(Keys.USER_ID, userID);
-        spEditor.putString(Keys.APP_KEY, appId);
-        spEditor.putString(Keys.APP_SECRET, appSecret);
-        spEditor.putString(Keys.USER_TOKEN, userToken);
-        spEditor.putString(Keys.AUTH_TOKEN, app_Token);
+        spEditor.putString(STTKeys.USER_ID, userID);
+        spEditor.putString(STTKeys.APP_KEY, appId);
+        spEditor.putString(STTKeys.APP_SECRET, appSecret);
+        spEditor.putString(STTKeys.USER_TOKEN, userToken);
+        spEditor.putString(STTKeys.AUTH_TOKEN, app_Token);
         spEditor.commit();
         //AUTH_TOKEN
 
-        Log.d("STTarter", Keys.USER_ID + " : " + sp.getString(Keys.USER_ID, ""));
+        Log.d("STTarter", STTKeys.USER_ID + " : " + sp.getString(STTKeys.USER_ID, ""));
 
         Log.d("STTarter", "Context - " + this.context);
         sttgr = new STTGeneralRoutines();
@@ -163,7 +163,7 @@ public class STTarter {
         params.put("mobile", mobileStr);
         params.put("org_id", orgStr);
 
-        //String url = Keys.GET_OTP;
+        //String url = STTKeys.GET_OTP;
         Log.d(TAG, "GET_OTP url - " + url);
 
         GsonRequest<LoginResponse> myReq = new GsonRequest<LoginResponse>(
@@ -192,7 +192,7 @@ public class STTarter {
         params.put("otp", otpCode);
         params.put("org_id", orgStr);
 
-        //String url = Keys.OTP_LOGIN;
+        //String url = STTKeys.OTP_LOGIN;
         Log.d(TAG, "OTP_LOGIN url - " + url);
 
         GsonRequest<LoginOTPResponse> myReq = new GsonRequest<LoginOTPResponse>(
@@ -221,7 +221,7 @@ public class STTarter {
         params.put("email",emailStr);
         params.put("org_id", orgStr);
 
-        //String url = Keys.OTP_LOGIN;
+        //String url = STTKeys.OTP_LOGIN;
         Log.d(TAG, "Quick_LOGIN url - " + url);
 
         GsonRequest<LoginOTPResponse> myReq = new GsonRequest<LoginOTPResponse>(
@@ -248,7 +248,7 @@ public class STTarter {
         params.put("subject", email.getSubject());
         params.put("message", email.getMessage());
 
-        String url = Keys.EMAIL;
+        String url = STTKeys.EMAIL;
         Log.d(TAG, "Email url - " + url);
 
         GsonRequest<MyResponse> myReq = new GsonRequest<MyResponse>(
@@ -275,8 +275,8 @@ public class STTarter {
         params.put("subject", email.getSubject());
         params.put("message", email.getMessage());*/
 
-        sp = context.getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-        String url = Keys.BUZZ_MESSAGES+"/"+sp.getString(Keys.BUZZ_TOPIC,"");
+        sp = context.getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+        String url = STTKeys.BUZZ_MESSAGES+"/"+sp.getString(STTKeys.BUZZ_TOPIC,"");
         Log.d(TAG, "Buzz url - " + url);
 
         GsonRequest<BuzzArrayListModel> myReq = new GsonRequest<BuzzArrayListModel>(
@@ -323,7 +323,7 @@ public class STTarter {
 
     public void user(String userId) {
 
-        PreferenceHelper.getSharedPreferenceEditor().putString(Keys.USER_ID, userId).commit();
+        PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.USER_ID, userId).commit();
         Log.d("STTarter", "USER_ID - " + userId);
 
         try {
@@ -339,8 +339,8 @@ public class STTarter {
 
     public Map<String, String>  getHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(Keys.USER_TOKEN,""));
-        headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(Keys.AUTH_TOKEN,""));
+        headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_TOKEN,""));
+        headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(STTKeys.AUTH_TOKEN,""));
         //headers.put("X-App-Token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0MzU0MDQ1MzQ4NzQsImFwcCI6eyJuYW1lIjoidGVzdCBhcHAiLCJwZXJtaXNzaW9ucyI6IjEsMiwzLDQiLCJhcHBfa2V5IjoiZTc0MTkwZGZkYjFmNDkwZDNkYjBkNzJiOTQ1YzY3YmEifX0.ivHRsje-Rk0k1_msPjhRfk6H57OwBDXj4uzxaSWxv4c");
         Iterator it = headers.entrySet().iterator();
         while(it.hasNext()) {
@@ -374,7 +374,7 @@ public class STTarter {
         try {
             Connections.getInstance(context).getConnection(clientHandle).getClient()
                     .subscribe(topics, qos, null, new ActionListener(context, ActionListener.Action.SUBSCRIBE, clientHandle, topics));
-            Log.d("subscribeAll", "subscribed - " + PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS, ""));
+            Log.d("subscribeAll", "subscribed - " + PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS, ""));
         }
         catch (MqttSecurityException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topics.length + " topics, the client with the handle " + clientHandle, e);
@@ -431,7 +431,7 @@ public class STTarter {
     }*/
 
     public String[] getSubscribedTopics() {
-        String subscribedString = PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"");
+        String subscribedString = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"");
         return subscribedString.split(",");
     }
 
@@ -443,7 +443,7 @@ public class STTarter {
     }
 
     public void clearNotificationString() {
-        PreferenceHelper.getSharedPreferenceEditor().putString(Keys.NOTIFICATION_TOPICS,"").commit();
+        PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.NOTIFICATION_TOPICS,"").commit();
     }
 
     /*
@@ -553,15 +553,15 @@ public class STTarter {
      */
     public void initiateConnnection(NotificationHelperListener notificationHelperListener) throws ContextNotInitializedException{
 
-        if(!PreferenceHelper.getSharedPreference().getString(Keys.USER_ID,"").equals("")) {
+        if(!PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"").equals("")) {
 
             Bundle bundle = new Bundle();
             //put data into a bundle to be passed back to ClientConnections
-            bundle.putString(ActivityConstants.server, Keys.SERVER_URL);
-            bundle.putString(ActivityConstants.port, Keys.PORT);
+            bundle.putString(ActivityConstants.server, STTKeys.SERVER_URL);
+            bundle.putString(ActivityConstants.port, STTKeys.PORT);
             bundle.putString(ActivityConstants.clientId, clientId);
             bundle.putInt(ActivityConstants.action, ActivityConstants.connect);
-            bundle.putBoolean(ActivityConstants.cleanSession, Keys.CLEAN_SESSION);
+            bundle.putBoolean(ActivityConstants.cleanSession, STTKeys.CLEAN_SESSION);
 
             bundle.putString(ActivityConstants.message,
                     ActivityConstants.empty);
@@ -797,7 +797,7 @@ public class STTarter {
 
             if(event.getNewValue()!=null && event.getNewValue().toString().equals("Client Connected")) {
                 Log.d("ChangeListener", "ChangeListener subscribeAll()");
-                STTarter.getInstance().subscribeAll(PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,"").split(","));
+                STTarter.getInstance().subscribeAll(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").split(","));
             } else if (event.getPropertyName().equals("connectionStatus")){
                 Log.d("ChangeListener", "Event status : " + event.getOldValue() + " to " + event.getNewValue());
                 /*
@@ -815,7 +815,7 @@ public class STTarter {
                 Log.d("ChangeListener", "Connection property changed");
                 if(Connections.getInstance(STTarter.getInstance().getContext()).getConnection(clientHandle).isConnected()) {
 
-                    Log.d("ChangeListener", "subscribed topics - " + PreferenceHelper.getSharedPreference().getString(Keys.SUBSCRIBED_TOPICS,""));
+                    Log.d("ChangeListener", "subscribed topics - " + PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,""));
                 }
             } catch (ContextNotInitializedException e) {
                 e.printStackTrace();

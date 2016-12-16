@@ -27,7 +27,7 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.spurtreetech.sttarter.lib.helper.Keys;
+import com.spurtreetech.sttarter.lib.helper.STTKeys;
 import com.spurtreetech.sttarter.lib.helper.STTarter;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -652,17 +652,17 @@ public class MqttService extends Service implements MqttTraceHandler {
     if(!STTarter.getInstance().isConnectedOrConnecting()) {
 
       Log.i("MqttService", "reconnecting...");
-      sp = this.getApplicationContext().getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+      sp = this.getApplicationContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
 
       // TODO check if shraredPreferences are set if not then do not start the service,
       // happens when app is installed but not logged in even once
-      if(!sp.getString(Keys.APP_KEY, "").equals("")) {
+      if(!sp.getString(STTKeys.APP_KEY, "").equals("")) {
         // TODO connect to the Mqtt client again
         STTarter.getInstance().init(
-                sp.getString(Keys.APP_KEY, ""),
-                sp.getString(Keys.APP_SECRET, ""),
-                sp.getString(Keys.USER_ID, ""),
-                sp.getString(Keys.USER_TOKEN, ""),sp.getString(Keys.AUTH_TOKEN,""),
+                sp.getString(STTKeys.APP_KEY, ""),
+                sp.getString(STTKeys.APP_SECRET, ""),
+                sp.getString(STTKeys.USER_ID, ""),
+                sp.getString(STTKeys.USER_TOKEN, ""),sp.getString(STTKeys.AUTH_TOKEN,""),
                 getApplicationContext(),null);
       }
 
