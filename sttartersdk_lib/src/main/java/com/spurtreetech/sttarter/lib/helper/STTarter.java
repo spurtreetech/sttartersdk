@@ -18,8 +18,11 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.spurtreetech.sttarter.lib.helper.Connection.ConnectionStatus;
+import com.spurtreetech.sttarter.lib.helper.models.BuzzArrayListModel;
+import com.spurtreetech.sttarter.lib.helper.models.Email;
 import com.spurtreetech.sttarter.lib.helper.models.LoginOTPResponse;
 import com.spurtreetech.sttarter.lib.helper.models.LoginResponse;
+import com.spurtreetech.sttarter.lib.helper.models.MyResponse;
 import com.spurtreetech.sttarter.lib.helper.utils.NotificationHelperListener;
 import com.spurtreetech.sttarter.lib.helper.volley.LruBitmapCache;
 import com.spurtreetech.sttarter.lib.provider.STTProviderHelper;
@@ -54,7 +57,7 @@ public class STTarter {
     SharedPreferences sp;
     SharedPreferences.Editor spEditor;
     private MqttAndroidClient client;
-    private MqttConnectOptions  conOpt;
+    private MqttConnectOptions conOpt;
 
 
     public static final String TAG = STTarter.class.getSimpleName();
@@ -151,7 +154,7 @@ public class STTarter {
     }
 
 
-    public void loginUserRequestForOTP(Response.Listener<LoginResponse> registerSuccessListener, Response.ErrorListener loginResponseListener,String mobileStr, String orgStr, Context applicationContext) {
+    public void loginUserRequestForOTP(String url, Response.Listener<LoginResponse> registerSuccessListener, Response.ErrorListener loginResponseListener, String mobileStr, String orgStr, Context applicationContext) {
 
         this.context = applicationContext;
 
@@ -160,7 +163,7 @@ public class STTarter {
         params.put("mobile", mobileStr);
         params.put("org_id", orgStr);
 
-        String url = Keys.GET_OTP;
+        //String url = Keys.GET_OTP;
         Log.d(TAG, "GET_OTP url - " + url);
 
         GsonRequest<LoginResponse> myReq = new GsonRequest<LoginResponse>(
@@ -180,7 +183,7 @@ public class STTarter {
     }
 
 
-    public void confirmOTPWithServer(String otpCode,Response.Listener<LoginOTPResponse> getOtpSuccessListener, Response.ErrorListener getOTPResponseListener,String mobileStr, String orgStr, Context applicationContext) {
+    public void confirmOTPWithServer(String url, String otpCode, Response.Listener<LoginOTPResponse> getOtpSuccessListener, Response.ErrorListener getOTPResponseListener, String mobileStr, String orgStr, Context applicationContext) {
 
         this.context = applicationContext;
 
@@ -189,7 +192,7 @@ public class STTarter {
         params.put("otp", otpCode);
         params.put("org_id", orgStr);
 
-        String url = Keys.OTP_LOGIN;
+        //String url = Keys.OTP_LOGIN;
         Log.d(TAG, "OTP_LOGIN url - " + url);
 
         GsonRequest<LoginOTPResponse> myReq = new GsonRequest<LoginOTPResponse>(
@@ -200,9 +203,96 @@ public class STTarter {
                 getOTPResponseListener,
                 Request.Method.POST,params);
 
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
         RequestQueueHelper.addToRequestQueue(myReq, "");
     }
 
+
+    public void quickLogin(String url, Response.Listener<LoginOTPResponse> getSuccessListener, Response.ErrorListener getErrorListener, String name, String mobileStr, String emailStr, String orgStr, Context applicationContext) {
+
+        this.context = applicationContext;
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("name", name);
+        params.put("mobile", mobileStr);
+        params.put("email",emailStr);
+        params.put("org_id", orgStr);
+
+        //String url = Keys.OTP_LOGIN;
+        Log.d(TAG, "Quick_LOGIN url - " + url);
+
+        GsonRequest<LoginOTPResponse> myReq = new GsonRequest<LoginOTPResponse>(
+                url,
+                LoginOTPResponse.class,
+                RequestQueueHelper.getHeaders(),
+                getSuccessListener,
+                getErrorListener,
+                Request.Method.POST,params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
+    public void sendMail(Email email, Response.Listener<MyResponse> getEmailSuccessListener, Response.ErrorListener getEmailResponseListener, Context applicationContext) {
+
+        this.context = applicationContext;
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("email", email.getEmail());
+        params.put("subject", email.getSubject());
+        params.put("message", email.getMessage());
+
+        String url = Keys.EMAIL;
+        Log.d(TAG, "Email url - " + url);
+
+        GsonRequest<MyResponse> myReq = new GsonRequest<MyResponse>(
+                url,
+                MyResponse.class,
+                getHeaders(),
+                getEmailSuccessListener,
+                getEmailResponseListener,
+                Request.Method.POST,params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
+    public void getBuzzMessages(Response.Listener<BuzzArrayListModel> getBuzzResponseListener, Response.ErrorListener getBuzzErrorResponseListener, Context applicationContext) {
+
+        this.context = applicationContext;
+
+        Map<String, String> params = new HashMap<String, String>();
+        /*params.put("email", email.getEmail());
+        params.put("subject", email.getSubject());
+        params.put("message", email.getMessage());*/
+
+        sp = context.getSharedPreferences(Keys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+        String url = Keys.BUZZ_MESSAGES+"/"+sp.getString(Keys.BUZZ_TOPIC,"");
+        Log.d(TAG, "Buzz url - " + url);
+
+        GsonRequest<BuzzArrayListModel> myReq = new GsonRequest<BuzzArrayListModel>(
+                url,
+                BuzzArrayListModel.class,
+                getHeaders(),
+                getBuzzResponseListener,
+                getBuzzErrorResponseListener,
+                Request.Method.GET,params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
 
     /**
      * Checks if the application is being sent in the background (i.e behind
@@ -530,7 +620,7 @@ public class STTarter {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
-        MqttConnectOptions  conOpt = new MqttConnectOptions();
+        MqttConnectOptions conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
         Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
