@@ -339,13 +339,18 @@ public class STTarter {
 
     public Map<String, String>  getHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_TOKEN,""));
-        headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(STTKeys.AUTH_TOKEN,""));
-        //headers.put("X-App-Token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0MzU0MDQ1MzQ4NzQsImFwcCI6eyJuYW1lIjoidGVzdCBhcHAiLCJwZXJtaXNzaW9ucyI6IjEsMiwzLDQiLCJhcHBfa2V5IjoiZTc0MTkwZGZkYjFmNDkwZDNkYjBkNzJiOTQ1YzY3YmEifX0.ivHRsje-Rk0k1_msPjhRfk6H57OwBDXj4uzxaSWxv4c");
-        Iterator it = headers.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry pairs = (Map.Entry)it.next();
-            Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
+        try {
+
+            headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_TOKEN, ""));
+            headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(STTKeys.AUTH_TOKEN, ""));
+            //headers.put("X-App-Token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0MzU0MDQ1MzQ4NzQsImFwcCI6eyJuYW1lIjoidGVzdCBhcHAiLCJwZXJtaXNzaW9ucyI6IjEsMiwzLDQiLCJhcHBfa2V5IjoiZTc0MTkwZGZkYjFmNDkwZDNkYjBkNzJiOTQ1YzY3YmEifX0.ivHRsje-Rk0k1_msPjhRfk6H57OwBDXj4uzxaSWxv4c");
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry) it.next();
+                Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return headers;
     }

@@ -1255,6 +1255,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		try{
 		Bundle data = intent.getExtras();
 
 		String handleFromIntent = data
@@ -1297,7 +1298,9 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		}else{
 			mqttService.traceError(MqttService.TAG, "Callback action doesn't exist.");	
 		}
-
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1343,7 +1346,11 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 			((MqttTokenAndroid) token).notifyComplete();
 		}
 		if (callback != null) {
-			callback.connectionLost(null);
+			try {
+				callback.connectionLost(null);
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -1354,9 +1361,13 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 	 */
 	private void connectionLostAction(Bundle data) {
 		if (callback != null) {
+			try{
 			Exception reason = (Exception) data
 					.getSerializable(MqttServiceConstants.CALLBACK_EXCEPTION);
 			callback.connectionLost(reason);
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

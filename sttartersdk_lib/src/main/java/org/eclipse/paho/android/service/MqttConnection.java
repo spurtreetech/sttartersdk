@@ -753,6 +753,7 @@ class MqttConnection implements MqttCallback {
 	 */
 	@Override
 	public void connectionLost(Throwable why) {
+		try {
 		service.traceDebug(TAG, "connectionLost(" + why.getMessage() + ")");
 		disconnected = true;
 		try {
@@ -790,6 +791,9 @@ class MqttConnection implements MqttCallback {
 		service.callbackToActivity(clientHandle, Status.OK, resultBundle);
 		// client has lost connection no need for wake lock
 		releaseWakeLock();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -942,8 +946,12 @@ class MqttConnection implements MqttCallback {
 	void offline() {
 		
 		if (!disconnected && !cleanSession) {
+			try{
 			Exception e = new Exception("Android offline");
 			connectionLost(e);
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 	
