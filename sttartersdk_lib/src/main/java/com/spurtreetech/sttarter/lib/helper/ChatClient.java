@@ -31,7 +31,7 @@ public class ChatClient {
     */
 
     private static void send(String message, String topic, String type, int qos) {
-
+        try{
         boolean retained = false;
 
         String[] args = new String[3];
@@ -69,10 +69,14 @@ public class ChatClient {
         } catch (STTarter.ContextNotInitializedException e) {
             e.printStackTrace();
         }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void sendMessage(String message, String topic) {
-
+        try{
         PayloadData pd = new PayloadData();
         pd.setType("message");
         pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
@@ -96,10 +100,14 @@ public class ChatClient {
         send(gson.toJson(pd), topic, "message", qos);
 
         Log.d("ChatClient", "converted json - " + gson.toJson(pd));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void sendSystemMessage(String topic, SysMessage messageType) {
-
+        try{
         String user = PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
         PayloadData pd = new PayloadData();
         pd.setType("system");
@@ -177,7 +185,10 @@ public class ChatClient {
         send(gson.toJson(pd),topic, "system", qos);
 
         Log.d("ChatClient", "converted json - " + gson.toJson(pd));
-
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
 

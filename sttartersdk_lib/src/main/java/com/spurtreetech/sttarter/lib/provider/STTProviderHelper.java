@@ -33,14 +33,12 @@ public class STTProviderHelper {
 
 
     public synchronized void insertTopics(ArrayList<Topic> data, boolean subscribedTopics) {
+        try {
+            //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
 
-        //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
-
-        ArrayList<TopicsContentValues> tcv = new ArrayList<>();
-        int count = 0;
-        for (Topic tempTopic: data) {
-
-            try {
+            ArrayList<TopicsContentValues> tcv = new ArrayList<>();
+            int count = 0;
+            for (Topic tempTopic : data) {
 
                 TopicsSelection where = new TopicsSelection();
                 where.topicName(tempTopic.getTopic());
@@ -50,10 +48,10 @@ public class STTProviderHelper {
                 TopicsContentValues temp = new TopicsContentValues();
 
                 // If already present then update else insert
-                if(c!=null && c.getCount()>0) {
+                if (c != null && c.getCount() > 0) {
 
                     // update subscribed status of topics from "mytopics" API
-                    if(subscribedTopics==true) {
+                    if (subscribedTopics == true) {
                         temp.putTopicIsSubscribed(subscribedTopics);
                         temp.putTopicIsPublic((tempTopic.getIs_public() == 1) ? true : false);
 
@@ -79,7 +77,7 @@ public class STTProviderHelper {
 
                     temp.putTopicMeta(sttJson);
                     temp.putTopicGroupMembers(groupMembersJson);
-                    if(subscribedTopics==true)
+                    if (subscribedTopics == true)
                         temp.putTopicIsSubscribed(subscribedTopics);
 
                     tcv.add(temp);
@@ -88,38 +86,30 @@ public class STTProviderHelper {
                 }
 
 
-            } catch (STTarter.ContextNotInitializedException e) {
-                e.printStackTrace();
-            }
-
-            // Bulk insert all rows that do not exist
-            if(count>0) {
-                ContentValues[] cv = new ContentValues[count];
-                count = 0;
-                for (TopicsContentValues tempTcv : tcv) {
-                    cv[count] = tempTcv.values();
-                }
-                try {
+                // Bulk insert all rows that do not exist
+                if (count > 0) {
+                    ContentValues[] cv = new ContentValues[count];
+                    count = 0;
+                    for (TopicsContentValues tempTcv : tcv) {
+                        cv[count] = tempTcv.values();
+                    }
                     STTarter.getInstance().getContext().getContentResolver().bulkInsert(TopicsColumns.CONTENT_URI, cv);
-                } catch (STTarter.ContextNotInitializedException e) {
-                    e.printStackTrace();
                 }
-            }
 
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     public synchronized void insertMessage(PayloadData pd, boolean is_sender, boolean is_delivered) {
-
+        try{
         TopicsSelection whereTopics = new TopicsSelection();
         whereTopics.topicName(pd.getPayload().getTopic());
         TopicsCursor tc = null;
-        try {
             tc = whereTopics.query(STTarter.getInstance().getContext());
             tc.moveToFirst();
-        } catch (STTarter.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
 
         Log.d("ContentProvider><><>>", pd.getPayload().toString());
 
@@ -138,26 +128,24 @@ public class STTProviderHelper {
         mcv.putFileType((pd.getFile_type() == null) ? "none" : pd.getFile_type());
         mcv.putFileUrl((pd.getFile_url() == null) ? "none" : pd.getFile_url());
 
-        try {
             mcv.insert(STTarter.getInstance().getContext());
             // Once message inserted update the last active timestamp for that topic
             updateTopicActiveTime(pd);
             Log.d(getClass().getSimpleName(), "Inserted Message: " + pd.getPayload().getMessage());
-        } catch (STTarter.ContextNotInitializedException e) {
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }
 
 
     public synchronized void insertUsers(ArrayList<Member_data> data) {
-
+        try{
         //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
 
         ArrayList<UsersContentValues> tcv = new ArrayList<>();
         int count = 0;
         for (Member_data tempUser: data) {
-
-            try {
 
                 UsersSelection where = new UsersSelection();
                 where.usersUserId(tempUser.getStt_id());
@@ -203,9 +191,6 @@ public class STTProviderHelper {
                 }
 
 
-            } catch (STTarter.ContextNotInitializedException e) {
-                e.printStackTrace();
-            }
 
             // Bulk insert all rows that do not exist
             if(count>0) {
@@ -214,51 +199,50 @@ public class STTProviderHelper {
                 for (UsersContentValues tempTcv : tcv) {
                     cv[count] = tempTcv.values();
                 }
-                try {
                     STTarter.getInstance().getContext().getContentResolver().bulkInsert(UsersColumns.CONTENT_URI, cv);
-                } catch (STTarter.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
             }
 
+        }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
 
     public void updateMessageSentStatus(PayloadData pd) {
-
+        try{
         MessagesSelection where = new MessagesSelection();
         where.messageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
 
         MessagesContentValues mcv = new MessagesContentValues();
         mcv.putMessageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
-        try {
             mcv.update(STTarter.getInstance().getContext(), where);
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public TopicsCursor getTopicData(String topicName) {
+        try{
         TopicsSelection where = new TopicsSelection();
         where.topicName(topicName);
-        try {
             return where.query(STTarter.getInstance().getContext());
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     public int updateTopicSubscribe (String topic, int subscribed) {
+        try{
         TopicsSelection where = new TopicsSelection();
         where.topicName(topic);
 
         TopicsContentValues tcv = new TopicsContentValues();
         tcv.putTopicIsSubscribed((subscribed == 1) ? true : false);
-        try {
             return tcv.update(STTarter.getInstance().getContext(), where);
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
@@ -284,27 +268,26 @@ public class STTProviderHelper {
      * @return
      */
     public MessagesCursor findMessage(String message, String topic, Long timestamp) {
+        try{
         MessagesSelection where = new MessagesSelection();
         where.messageHash(getMessageHash(message, topic, timestamp));
-        try {
             return where.query(STTarter.getInstance().getContext());
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     public void updateTopicActiveTime(PayloadData pd) {
-
+        try{
         TopicsSelection where = new TopicsSelection();
         where.topicName(pd.getPayload().getTopic());
 
         TopicsContentValues tcv = new TopicsContentValues();
         tcv.putTopicUpdatedUnixTimestamp(Long.parseLong(pd.getTimestamp()));
 
-        try {
             tcv.update(STTarter.getInstance().getContext(), where);
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -313,7 +296,7 @@ public class STTProviderHelper {
 
         try {
             return STTSQLiteOpenHelper.getInstance(STTarter.getInstance().getContext()).getReadableDatabase().rawQuery("SELECT messages.message_topic, count(messages.message_topic) as MESSAGE_COUNT, topics.topic_meta FROM messages JOIN topics ON (messages.message_topic_id=topics._id) WHERE is_read = 0 GROUP BY messages.message_topic", null);
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -321,14 +304,13 @@ public class STTProviderHelper {
     }
 
     public int getUnreadMessageCountForTopic(String topic) {
-
+        try{
         MessagesSelection where = new MessagesSelection();
         where.isRead(false).and().topicsTopicName(topic);
 
-        try {
             Cursor temp = where.query(STTarter.getInstance().getContext());
             return temp.getCount();
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -364,6 +346,7 @@ public class STTProviderHelper {
     }
 
     public void emptyAllTable() {
+        try{
         MessagesSelection whereMessages = new MessagesSelection();
         whereMessages.addRaw("1");
 
@@ -376,12 +359,11 @@ public class STTProviderHelper {
         TopicUsersSelection whereTopicsUsers = new TopicUsersSelection();
         whereTopicsUsers.addRaw("1");
 
-        try {
             whereMessages.delete(STTarter.getInstance().getContext());
             whereTopics.delete(STTarter.getInstance().getContext());
             whereUsers.delete(STTarter.getInstance().getContext());
             whereTopicsUsers.delete(STTarter.getInstance().getContext());
-        } catch (STTarter.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

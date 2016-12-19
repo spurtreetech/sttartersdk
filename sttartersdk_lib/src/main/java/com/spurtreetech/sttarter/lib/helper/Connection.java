@@ -99,6 +99,7 @@ public class Connection {
    */
   public static Connection createConnection(String clientId, String host,
       int port, Context context, boolean sslConnection) {
+    try{
     String handle = null;
     String uri = null;
     if (sslConnection) {
@@ -111,7 +112,11 @@ public class Connection {
     }
     MqttAndroidClient client = new MqttAndroidClient(context, uri, clientId);
     return new Connection(handle, clientId, host, port, context, client, sslConnection);
-
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**
@@ -127,20 +132,25 @@ public class Connection {
    */
   public Connection(String clientHandle, String clientId, String host,
       int port, Context context, MqttAndroidClient client, boolean sslConnection) {
-    //generate the client handle from its hash code
-    this.clientHandle = clientHandle;
-    this.clientId = clientId;
-    this.host = host;
-    this.port = port;
-    this.context = context;
-    this.client = client;
-    this.sslConnection = sslConnection;
-    history = new ArrayList<String>();
-    StringBuffer sb = new StringBuffer();
-    sb.append("Client: ");
-    sb.append(clientId);
-    sb.append(" created");
-    addAction(sb.toString());
+    try {
+      //generate the client handle from its hash code
+      this.clientHandle = clientHandle;
+      this.clientId = clientId;
+      this.host = host;
+      this.port = port;
+      this.context = context;
+      this.client = client;
+      this.sslConnection = sslConnection;
+      history = new ArrayList<String>();
+      StringBuffer sb = new StringBuffer();
+      sb.append("Client: ");
+      sb.append(clientId);
+      sb.append(" created");
+      addAction(sb.toString());
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -148,7 +158,7 @@ public class Connection {
    * @param action the history item to add
    */
   public void addAction(String action) {
-
+  try{
     Object[] args = new String[1];
     SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.dateFormat));
     args[0] = sdf.format(new Date());
@@ -157,6 +167,10 @@ public class Connection {
     history.add(action + timestamp);
 
     notifyListeners(new PropertyChangeEvent(this, ActivityConstants.historyProperty, null, action));
+  }
+  catch (Exception e){
+    e.printStackTrace();
+  }
   }
 
   /**
@@ -203,8 +217,14 @@ public class Connection {
    * @param connectionStatus The connection status of this connection
    */
   public void changeConnectionStatus(ConnectionStatus connectionStatus) {
+    try {
+
     status = connectionStatus;
     notifyListeners((new PropertyChangeEvent(this, ActivityConstants.ConnectionStatusProperty, null, null)));
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -216,6 +236,7 @@ public class Connection {
    */
   @Override
   public String toString() {
+    try{
     StringBuffer sb = new StringBuffer();
     sb.append(clientId);
     sb.append("\n ");
@@ -244,6 +265,11 @@ public class Connection {
     sb.append(host);
 
     return sb.toString();
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
+    return "";
   }
 
   /**

@@ -90,7 +90,7 @@ public class Connections {
    * @param connection connection to add
    */
   public void addConnection(Connection connection)
-  {
+  {try{
     connections.put(connection.handle(), connection);
     try {
       persistence.persistConnection(connection);
@@ -100,6 +100,10 @@ public class Connections {
       //error persisting well lets just swallow this
       e.printStackTrace();
     }
+  }
+  catch (Exception e){
+    e.printStackTrace();
+  }
   }
 
   /**
@@ -111,8 +115,14 @@ public class Connections {
    */
   public MqttAndroidClient createClient(Context context, String serverURI, String clientId)
   {
+    try{
     MqttAndroidClient client = new MqttAndroidClient(context, serverURI, clientId);
     return client;
+  }
+  catch (Exception e){
+    e.printStackTrace();
+  }
+    return null;
   }
 
   /**
@@ -129,8 +139,13 @@ public class Connections {
    * @param connection connection to be removed
    */
   public void removeConnection(Connection connection) {
+    try{
     connections.remove(connection.handle());
     persistence.deleteConnection(connection);
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
 }

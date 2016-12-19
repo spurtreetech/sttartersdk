@@ -387,6 +387,9 @@ public class STTarter {
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topics.length + " topics, the client with the handle " + clientHandle, e);
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void subscribe(String topic) {
@@ -403,6 +406,9 @@ public class STTarter {
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topic + " the client with the handle " + clientHandle, e);
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void unsubscribe(String topic) {
@@ -416,6 +422,9 @@ public class STTarter {
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topic + " the client with the handle " + clientHandle, e);
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void unsubscribe(String[] topics) {
@@ -428,6 +437,9 @@ public class STTarter {
         }
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to unsubscribe to" + topics.length + " topics, the client with the handle " + clientHandle, e);
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -557,7 +569,7 @@ public class STTarter {
      * initialize connection to the server
      */
     public void initiateConnnection(NotificationHelperListener notificationHelperListener) throws ContextNotInitializedException{
-
+        try{
         if(!PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"").equals("")) {
 
             Bundle bundle = new Bundle();
@@ -591,7 +603,10 @@ public class STTarter {
         } else {
             throw new ContextNotInitializedException("No user id specified");
         }
-
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public String getUserId(){
@@ -625,6 +640,7 @@ public class STTarter {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
+        try{
         MqttConnectOptions conOpt = new MqttConnectOptions();
         //conOpt.setCleanSession(false);
         //conO
@@ -778,7 +794,10 @@ public class STTarter {
             e.printStackTrace();
         }
         */
-
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -860,12 +879,16 @@ public class STTarter {
     }
 
     public void logout() {
+        try{
         STTarter.getInstance().client.stopService();
         STTProviderHelper ph = new STTProviderHelper();
         ph.emptyAllTable();
 //STTarter.getInstance().getContext().getDatabasePath(STTSQLiteOpenHelper.DATABASE_FILE_NAME).delete();
         PreferenceHelper.getSharedPreferenceEditor().clear().commit();
-
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

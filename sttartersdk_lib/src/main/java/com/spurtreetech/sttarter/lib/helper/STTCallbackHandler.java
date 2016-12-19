@@ -58,6 +58,7 @@ public class STTCallbackHandler implements MqttCallback {
      */
     @Override
     public void connectionLost(Throwable cause) {
+        try{
 //	  cause.printStackTrace();
         if (cause != null) {
             Connection c = Connections.getInstance(context).getConnection(clientHandle);
@@ -85,6 +86,10 @@ public class STTCallbackHandler implements MqttCallback {
                 e.printStackTrace();
             }
         }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -92,7 +97,7 @@ public class STTCallbackHandler implements MqttCallback {
      */
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-
+        try{
         //Get connection object associated with this object
         Connection c = Connections.getInstance(context).getConnection(clientHandle);
 
@@ -230,6 +235,10 @@ public class STTCallbackHandler implements MqttCallback {
         // TODO find if message exists, if not then insert it or else discard it. Also if exist check if it was by sender and mark it as sent.
 
         //if()
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**

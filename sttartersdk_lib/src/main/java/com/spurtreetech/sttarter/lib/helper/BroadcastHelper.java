@@ -16,18 +16,28 @@ public class BroadcastHelper {
     }
 
     public void sendMessage(String successful) {
+        try{
         Log.d("sender", "Broadcasting message");
         Intent intent = new Intent("test");
         intent.putExtra("message", successful);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void sendSystemMessage(String message, SysMessage type, String topic) {
+        try{
         Intent intent = new Intent("system");
         intent.putExtra("message", message);
         intent.putExtra("type", type.toString());
         intent.putExtra("topic", topic);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
    /* public void loadEvents() {
