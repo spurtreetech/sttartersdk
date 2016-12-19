@@ -3,14 +3,22 @@ package com.sttarter.communicator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteConstraintException;
+import android.net.http.AndroidHttpClient;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
+import com.android.volley.toolbox.HttpClientStack;
+import com.android.volley.toolbox.HttpStack;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.sttarter.common.utils.CustomHurlStack;
+import com.sttarter.common.utils.OkHttpHurlStack;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.init.Connections;
 import com.sttarter.common.utils.GsonRequest;
@@ -119,13 +127,7 @@ public class CommunicationManager {
                     //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                     Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
                     if(clientConnected) {
-                        if (tempGroup.getTopic()!=null && !TextUtils.isEmpty(tempGroup.getTopic())) {
-                            try {
-                                STTarterManager.getInstance().subscribe(tempGroup.getTopic());
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        }
+                        STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                     }
 
                     if(!tempGroup.getType().equals("master")) {
@@ -696,13 +698,13 @@ public class CommunicationManager {
             public void onResponse(STTResponse response) {
                 Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
                 if (callBack)
-                sttSuccessListener.Response(response);
+                    sttSuccessListener.Response(response);
             }
         };
     }
 
 
-    public void leaveGroup(String topicName,STTSuccessListener sttSuccessListener,Response.ErrorListener errorListener) {
+    public void leaveGroup(Context context,String topicName,STTSuccessListener sttSuccessListener,Response.ErrorListener errorListener) {
         Map<String, String> params = new HashMap<String, String>();
         String[] topic = topicName.split("-group-");
         params.put("group_id", topic[topic.length-1]);
@@ -737,7 +739,19 @@ public class CommunicationManager {
 
         // set this to be executed before any other rquesst in queue
         //myReq.setSequence(0);
-        RequestQueueHelper.addToRequestQueue(myReq);
+        //RequestQueueHelper.addToRequestQueue(myReq);
+
+        HttpStack httpStack;
+        if (Build.VERSION.SDK_INT > 19){
+            httpStack = new CustomHurlStack();
+        } else if (Build.VERSION.SDK_INT >= 9 && Build.VERSION.SDK_INT <= 19)
+        {
+            httpStack = new OkHttpHurlStack();
+        } else {
+            httpStack = new HttpClientStack(AndroidHttpClient.newInstance("Android"));
+        }
+        RequestQueue requestQueue = Volley.newRequestQueue(context, httpStack);
+        requestQueue.add(myReq);
     }
 
     private Response.Listener<STTResponse> unsubscribeSuccessListener(final STTSuccessListener sttSuccessListener, final String topicName) {

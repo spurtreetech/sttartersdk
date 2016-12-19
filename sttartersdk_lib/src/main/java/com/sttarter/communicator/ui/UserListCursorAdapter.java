@@ -52,21 +52,24 @@ public class UserListCursorAdapter extends CursorRecyclerAdapter<UserListCursorA
 
         STTarterManager.getInstance().setContext(activity);
 
-        try {
-            viewHolder.userIconImageView.setImageUrl(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_AVATAR)), STTarterManager.getInstance().getImageLoader());
-        }catch (Exception e){
-            e.printStackTrace();
+        if (URLUtil.isValidUrl(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_AVATAR)))) {
+            try {
+                viewHolder.userIconImageView.setImageUrl(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_AVATAR)), STTarterManager.getInstance().getImageLoader());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         viewHolder.userNameTextView.setText(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_USERNAME)));
 
         viewHolder.rootviewLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    cursor.moveToPosition(viewHolder.getLayoutPosition());
+                cursor.moveToPosition(viewHolder.getLayoutPosition());
                     /*User user = new User();
                     user.setAvatar(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_AVATAR)));
                     user.setUsername(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_USERNAME)));*/
-                    addRemoveUserInterface.addOrRemove(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_USERNAME)),true);
+                addRemoveUserInterface.addOrRemove(cursor.getString(cursor.getColumnIndex(UsersColumns.USERS_USERNAME)),true);
             }
         });
 

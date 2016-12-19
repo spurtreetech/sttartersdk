@@ -32,7 +32,6 @@ import com.sttarter.helper.uitools.LruBitmapCache;
 import com.sttarter.helper.utils.NotificationHelperListener;
 import com.sttarter.provider.STTProviderHelper;
 import com.sttarter.referral.ReferralManager;
-import com.sttarter.referral.interfaces.STTReferralInterface;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.android.service.MqttService;
@@ -472,6 +471,9 @@ public class STTarterManager {
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topic + " the client with the handle " + clientHandle, e);
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void unsubscribe(String topic) {
@@ -484,6 +486,9 @@ public class STTarterManager {
         }
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to subscribe to" + topic + " the client with the handle " + clientHandle, e);
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -498,6 +503,10 @@ public class STTarterManager {
         catch (MqttException e) {
             Log.e(this.getClass().getCanonicalName(), "Failed to unsubscribe to" + topics.length + " topics, the client with the handle " + clientHandle, e);
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /*public void initChat(String requestingUser, String requestedUser) {
@@ -626,41 +635,44 @@ public class STTarterManager {
      * initialize connection to the server
      */
     public void initiateConnnection(NotificationHelperListener notificationHelperListener) throws ContextNotInitializedException{
+        try{
+            if(!PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"").equals("")) {
 
-        if(!PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,"").equals("")) {
+                Bundle bundle = new Bundle();
+                //put data into a bundle to be passed back to ClientConnections
+                bundle.putString(ActivityConstants.server, STTKeys.SERVER_URL);
+                bundle.putString(ActivityConstants.port, STTKeys.PORT);
+                bundle.putString(ActivityConstants.clientId, clientId);
+                bundle.putInt(ActivityConstants.action, ActivityConstants.connect);
+                bundle.putBoolean(ActivityConstants.cleanSession, STTKeys.CLEAN_SESSION);
 
-            Bundle bundle = new Bundle();
-            //put data into a bundle to be passed back to ClientConnections
-            bundle.putString(ActivityConstants.server, STTKeys.SERVER_URL);
-            bundle.putString(ActivityConstants.port, STTKeys.PORT);
-            bundle.putString(ActivityConstants.clientId, clientId);
-            bundle.putInt(ActivityConstants.action, ActivityConstants.connect);
-            bundle.putBoolean(ActivityConstants.cleanSession, STTKeys.CLEAN_SESSION);
+                bundle.putString(ActivityConstants.message,
+                        ActivityConstants.empty);
+                bundle.putString(ActivityConstants.topic, ActivityConstants.empty);
+                bundle.putInt(ActivityConstants.qos, ActivityConstants.defaultQos);
+                bundle.putBoolean(ActivityConstants.retained,
+                        ActivityConstants.defaultRetained);
 
-            bundle.putString(ActivityConstants.message,
-                    ActivityConstants.empty);
-            bundle.putString(ActivityConstants.topic, ActivityConstants.empty);
-            bundle.putInt(ActivityConstants.qos, ActivityConstants.defaultQos);
-            bundle.putBoolean(ActivityConstants.retained,
-                    ActivityConstants.defaultRetained);
+                bundle.putString(ActivityConstants.username,
+                        ActivityConstants.empty);
+                bundle.putString(ActivityConstants.password,
+                        ActivityConstants.empty);
 
-            bundle.putString(ActivityConstants.username,
-                    ActivityConstants.empty);
-            bundle.putString(ActivityConstants.password,
-                    ActivityConstants.empty);
+                bundle.putInt(ActivityConstants.timeout,
+                        ActivityConstants.defaultTimeOut);
+                bundle.putInt(ActivityConstants.keepalive,
+                        ActivityConstants.defaultKeepAlive);
+                bundle.putBoolean(ActivityConstants.ssl,
+                        ActivityConstants.defaultSsl);
 
-            bundle.putInt(ActivityConstants.timeout,
-                    ActivityConstants.defaultTimeOut);
-            bundle.putInt(ActivityConstants.keepalive,
-                    ActivityConstants.defaultKeepAlive);
-            bundle.putBoolean(ActivityConstants.ssl,
-                    ActivityConstants.defaultSsl);
-
-            connectAction(bundle,notificationHelperListener);
-        } else {
-            throw new ContextNotInitializedException("No user id specified");
+                connectAction(bundle,notificationHelperListener);
+            } else {
+                throw new ContextNotInitializedException("No user id specified");
+            }
         }
-
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public String getUsername(){
@@ -699,10 +711,11 @@ public class STTarterManager {
      * @param data the {@link Bundle} returned by the inti function
      */
     private void connectAction(Bundle data, NotificationHelperListener notificationHelperListener) {
-        MqttConnectOptions  conOpt = new MqttConnectOptions();
-        //conOpt.setCleanSession(false);
-        //conO
-        Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
+        try{
+            MqttConnectOptions  conOpt = new MqttConnectOptions();
+            //conOpt.setCleanSession(false);
+            //conO
+            Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
     /*
      * Mutal Auth connections could do something like this
      *
@@ -718,131 +731,131 @@ public class STTarterManager {
      *
      */
 
-        // The basic client information
-        String server = (String) data.get(ActivityConstants.server);
-        String clientId = (String) data.get(ActivityConstants.clientId);
-        int port = Integer.parseInt((String) data.get(ActivityConstants.port));
-        boolean cleanSession = (Boolean) data.get(ActivityConstants.cleanSession);
+            // The basic client information
+            String server = (String) data.get(ActivityConstants.server);
+            String clientId = (String) data.get(ActivityConstants.clientId);
+            int port = Integer.parseInt((String) data.get(ActivityConstants.port));
+            boolean cleanSession = (Boolean) data.get(ActivityConstants.cleanSession);
 
-        boolean ssl = (Boolean) data.get(ActivityConstants.ssl);
-        String ssl_key = (String) data.get(ActivityConstants.ssl_key);
-        String uri = null;
-        if (ssl) {
-            Log.e("SSLConnection", "Doing an SSL Connect");
-            uri = "ssl://";
+            boolean ssl = (Boolean) data.get(ActivityConstants.ssl);
+            String ssl_key = (String) data.get(ActivityConstants.ssl_key);
+            String uri = null;
+            if (ssl) {
+                Log.e("SSLConnection", "Doing an SSL Connect");
+                uri = "ssl://";
 
-        }
-        else {
-            uri = "tcp://";
-        }
-
-        uri = uri + server + ":" + port;
-
-        //MqttAndroidClient client;
-        client = Connections.getInstance(this.context).createClient(this.context, uri, clientId);
-
-        Log.d(getClass().getSimpleName(), "Client: " + client);
-
-        if (ssl){
-            try {
-                if(ssl_key != null && !ssl_key.equalsIgnoreCase(""))
-                {
-                    FileInputStream key = new FileInputStream(ssl_key);
-                    conOpt.setSocketFactory(client.getSSLSocketFactory(key,
-                            "STTtest"));
-                }
-            } catch (MqttSecurityException e) {
-                Log.e(this.getClass().getCanonicalName(),
-                        "MqttException Occured: ", e);
-            } catch (FileNotFoundException e) {
-                Log.e(this.getClass().getCanonicalName(),
-                        "MqttException Occured: SSL Key file not found", e);
             }
-        }
-
-        // create a client handle
-        clientHandle = uri + clientId;
-
-        Log.d(getClass().getName(), "clientHandle: " + clientHandle);
-
-        // last will message
-        String message = (String) data.get(ActivityConstants.message);
-        String topic = (String) data.get(ActivityConstants.topic);
-        Integer qos = (Integer) data.get(ActivityConstants.qos);
-        Boolean retained = (Boolean) data.get(ActivityConstants.retained);
-
-        // connection options
-
-        String username = (String) data.get(ActivityConstants.username);
-
-        String password = (String) data.get(ActivityConstants.password);
-
-        int timeout = (Integer) data.get(ActivityConstants.timeout);
-        int keepalive = (Integer) data.get(ActivityConstants.keepalive);
-
-        connection = new Connection(clientHandle, clientId, server, port, context, client, ssl);
-        //arrayAdapter.add(connection);
-
-        connection.registerChangeListener(changeListener);
-        // connect client
-
-        String[] actionArgs = new String[1];
-        actionArgs[0] = clientId;
-        connection.changeConnectionStatus(ConnectionStatus.CONNECTING);
-
-        conOpt.setCleanSession(cleanSession);
-        conOpt.setConnectionTimeout(timeout);
-        Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
-        conOpt.setKeepAliveInterval(keepalive);
-        if (!username.equals(ActivityConstants.empty)) {
-            conOpt.setUserName(username);
-        }
-        if (!password.equals(ActivityConstants.empty)) {
-            conOpt.setPassword(password.toCharArray());
-        }
-
-        final ActionListener callback = new ActionListener(context,
-                ActionListener.Action.CONNECT, clientHandle, actionArgs);
-
-        boolean doConnect = true;
-
-        if ((!message.equals(ActivityConstants.empty))
-                || (!topic.equals(ActivityConstants.empty))) {
-            // need to make a message since last will is set
-            try {
-                conOpt.setWill(topic, message.getBytes(), qos.intValue(),
-                        retained.booleanValue());
+            else {
+                uri = "tcp://";
             }
-            catch (Exception e) {
-                Log.e(this.getClass().getCanonicalName(), "Exception Occured", e);
-                doConnect = false;
-                callback.onFailure(null, e);
-            }
-        }
 
-        // whenever a new message arrives or connection is lost
-        client.setCallback(new STTCallbackHandler(this.context, clientHandle,notificationHelperListener));
+            uri = uri + server + ":" + port;
 
+            //MqttAndroidClient client;
+            client = Connections.getInstance(this.context).createClient(this.context, uri, clientId);
 
-        //set traceCallback
-        client.setTraceCallback(new STTTraceCallback());
+            Log.d(getClass().getSimpleName(), "Client: " + client);
 
-        connection.addConnectionOptions(conOpt);
-        Connections.getInstance(this.context).addConnection(connection);
-        //this.client = client;
-        this.conOpt = conOpt;
-        if (doConnect) {
-            Thread t = new Thread(){
-                public void run(){
-                    try {
-                        STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            if (ssl){
+                try {
+                    if(ssl_key != null && !ssl_key.equalsIgnoreCase(""))
+                    {
+                        FileInputStream key = new FileInputStream(ssl_key);
+                        conOpt.setSocketFactory(client.getSSLSocketFactory(key,
+                                "STTtest"));
                     }
+                } catch (MqttSecurityException e) {
+                    Log.e(this.getClass().getCanonicalName(),
+                            "MqttException Occured: ", e);
+                } catch (FileNotFoundException e) {
+                    Log.e(this.getClass().getCanonicalName(),
+                            "MqttException Occured: SSL Key file not found", e);
                 }
-            };
-            t.start();
-        }
+            }
+
+            // create a client handle
+            clientHandle = uri + clientId;
+
+            Log.d(getClass().getName(), "clientHandle: " + clientHandle);
+
+            // last will message
+            String message = (String) data.get(ActivityConstants.message);
+            String topic = (String) data.get(ActivityConstants.topic);
+            Integer qos = (Integer) data.get(ActivityConstants.qos);
+            Boolean retained = (Boolean) data.get(ActivityConstants.retained);
+
+            // connection options
+
+            String username = (String) data.get(ActivityConstants.username);
+
+            String password = (String) data.get(ActivityConstants.password);
+
+            int timeout = (Integer) data.get(ActivityConstants.timeout);
+            int keepalive = (Integer) data.get(ActivityConstants.keepalive);
+
+            connection = new Connection(clientHandle, clientId, server, port, context, client, ssl);
+            //arrayAdapter.add(connection);
+
+            connection.registerChangeListener(changeListener);
+            // connect client
+
+            String[] actionArgs = new String[1];
+            actionArgs[0] = clientId;
+            connection.changeConnectionStatus(ConnectionStatus.CONNECTING);
+
+            conOpt.setCleanSession(cleanSession);
+            conOpt.setConnectionTimeout(timeout);
+            Log.d(this.getClass().getCanonicalName(), "conOpt - " + conOpt.toString());
+            conOpt.setKeepAliveInterval(keepalive);
+            if (!username.equals(ActivityConstants.empty)) {
+                conOpt.setUserName(username);
+            }
+            if (!password.equals(ActivityConstants.empty)) {
+                conOpt.setPassword(password.toCharArray());
+            }
+
+            final ActionListener callback = new ActionListener(context,
+                    ActionListener.Action.CONNECT, clientHandle, actionArgs);
+
+            boolean doConnect = true;
+
+            if ((!message.equals(ActivityConstants.empty))
+                    || (!topic.equals(ActivityConstants.empty))) {
+                // need to make a message since last will is set
+                try {
+                    conOpt.setWill(topic, message.getBytes(), qos.intValue(),
+                            retained.booleanValue());
+                }
+                catch (Exception e) {
+                    Log.e(this.getClass().getCanonicalName(), "Exception Occured", e);
+                    doConnect = false;
+                    callback.onFailure(null, e);
+                }
+            }
+
+            // whenever a new message arrives or connection is lost
+            client.setCallback(new STTCallbackHandler(this.context, clientHandle,notificationHelperListener));
+
+
+            //set traceCallback
+            client.setTraceCallback(new STTTraceCallback());
+
+            connection.addConnectionOptions(conOpt);
+            Connections.getInstance(this.context).addConnection(connection);
+            //this.client = client;
+            this.conOpt = conOpt;
+            if (doConnect) {
+                Thread t = new Thread(){
+                    public void run(){
+                        try {
+                            STTarterManager.getInstance().client.connect(STTarterManager.getInstance().conOpt, null, callback);
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+            }
 
         /*
         Intent testServiceIntent = new Intent(STTarterManager.getInstance().context, TestService.class);
@@ -852,7 +865,10 @@ public class STTarterManager {
             e.printStackTrace();
         }
         */
-
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -934,20 +950,20 @@ public class STTarterManager {
     }
 
     public void logout(Context context) {
-        this.context = context;
-        try {
+        try{
+            this.context = context;
             if (client!=null && client.isConnected())
                 client.disconnect();
-        } catch (MqttException e) {
+            STTProviderHelper ph = new STTProviderHelper();
+            ph.emptyAllTable();
+            //STTarterManager.getInstance().getContext().getDatabasePath(STTSQLiteOpenHelper.DATABASE_FILE_NAME).delete();
+            sp = context.getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+            spEditor = sp.edit();
+            spEditor.clear().commit();
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
-        STTProviderHelper ph = new STTProviderHelper();
-        ph.emptyAllTable();
-        //STTarterManager.getInstance().getContext().getDatabasePath(STTSQLiteOpenHelper.DATABASE_FILE_NAME).delete();
-        sp = context.getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-        spEditor = sp.edit();
-        spEditor.clear().commit();
-
     }
 
 }

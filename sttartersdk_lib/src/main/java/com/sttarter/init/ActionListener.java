@@ -102,22 +102,27 @@ public class ActionListener implements IMqttActionListener {
    */
   @Override
   public void onSuccess(IMqttToken asyncActionToken) {
-    switch (action) {
-      case CONNECT :
-        connect();
-        break;
-      case DISCONNECT :
-        disconnect();
-        break;
-      case SUBSCRIBE :
-        subscribe();
-        break;
-      case PUBLISH :
-        publish();
-        break;
-      case UNSUBSCRIBE:
-        unsubscribe();
-        break;
+    try{
+      switch (action) {
+        case CONNECT :
+          connect();
+          break;
+        case DISCONNECT :
+          disconnect();
+          break;
+        case SUBSCRIBE :
+          subscribe();
+          break;
+        case PUBLISH :
+          publish();
+          break;
+        case UNSUBSCRIBE:
+          unsubscribe();
+          break;
+      }
+    }
+    catch (Exception e){
+      e.printStackTrace();
     }
   }
 
@@ -127,14 +132,17 @@ public class ActionListener implements IMqttActionListener {
    * user of success
    */
   private void publish() {
-
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    String actionTaken = context.getString(R.string.toast_pub_success,
-            (Object[]) additionalArgs);
-    //String actionTaken = context.getString(R.string.toast_pub_success);
-    c.addAction(actionTaken);
-    //Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
-
+    try{
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      String actionTaken = context.getString(R.string.toast_pub_success,
+              (Object[]) additionalArgs);
+      //String actionTaken = context.getString(R.string.toast_pub_success);
+      c.addAction(actionTaken);
+      //Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -143,16 +151,21 @@ public class ActionListener implements IMqttActionListener {
    * the user of success
    */
   private void subscribe() {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    String actionTaken = context.getString(R.string.toast_sub_success,
-            (Object[]) additionalArgs);
-    c.addAction(actionTaken);
-    Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
+    try {
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      String actionTaken = context.getString(R.string.toast_sub_success,
+              (Object[]) additionalArgs);
+      c.addAction(actionTaken);
+      Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
 
-    //Log.d("ActionListener", "subscribe - " + additionalArgs[0]);
-    // TODO call the subscribe function with the topic name
-    //String topic[] = additionalArgs[1].split(";");
-    //gr.subscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,""));
+      //Log.d("ActionListener", "subscribe - " + additionalArgs[0]);
+      // TODO call the subscribe function with the topic name
+      //String topic[] = additionalArgs[1].split(";");
+      //gr.subscribeTopic(additionalArgs[0], PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID,""));
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -161,11 +174,12 @@ public class ActionListener implements IMqttActionListener {
    * then notify the user of success.
    */
   private void disconnect() {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    c.changeConnectionStatus(ConnectionStatus.DISCONNECTED);
-    String actionTaken = context.getString(R.string.toast_disconnected);
-    c.addAction(actionTaken);
-    // TODO if connected for first time then get list of topics and subscribe to all
+    try {
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      c.changeConnectionStatus(ConnectionStatus.DISCONNECTED);
+      String actionTaken = context.getString(R.string.toast_disconnected);
+      c.addAction(actionTaken);
+      // TODO if connected for first time then get list of topics and subscribe to all
     /*
     try {
       STTarterManager.getInstance().initiateConnnection();
@@ -173,6 +187,10 @@ public class ActionListener implements IMqttActionListener {
       e.printStackTrace();
     }
     */
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -181,16 +199,16 @@ public class ActionListener implements IMqttActionListener {
    * then notify the user of success.
    */
   private void connect() {
+    try {
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      c.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
+      c.addAction("Client Connected");
+      Notify.toast(context, "Client Connected", Toast.LENGTH_SHORT);
 
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    c.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
-    c.addAction("Client Connected");
-    Notify.toast(context, "Client Connected", Toast.LENGTH_SHORT);
-
-    //if(!PreferenceHelper.getSharedPreference().getString(STTKeys.ALL_TOPICS_LIST,"").equals("")) {
-    CommunicationManager sttGeneralRoutines = new CommunicationManager();
-    sttGeneralRoutines.subscribeInitalize();
-    //}
+      //if(!PreferenceHelper.getSharedPreference().getString(STTKeys.ALL_TOPICS_LIST,"").equals("")) {
+      CommunicationManager sttGeneralRoutines = new CommunicationManager();
+      sttGeneralRoutines.subscribeInitalize();
+      //}
 
 
     /*
@@ -200,6 +218,10 @@ public class ActionListener implements IMqttActionListener {
       sGR.subscribeInitalize("345","346");
     }
     */
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -224,21 +246,25 @@ public class ActionListener implements IMqttActionListener {
    */
   @Override
   public void onFailure(IMqttToken token, Throwable exception) {
-    switch (action) {
-      case CONNECT :
-        connect(exception);
-        break;
-      case DISCONNECT :
-        disconnect(exception);
-        break;
-      case SUBSCRIBE :
-        subscribe(exception);
-        break;
-      case PUBLISH :
-        publish(exception);
-        break;
+    try{
+      switch (action) {
+        case CONNECT :
+          connect(exception);
+          break;
+        case DISCONNECT :
+          disconnect(exception);
+          break;
+        case SUBSCRIBE :
+          subscribe(exception);
+          break;
+        case PUBLISH :
+          publish(exception);
+          break;
+      }
     }
-
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -248,12 +274,17 @@ public class ActionListener implements IMqttActionListener {
    *            This argument is not used
    */
   private void publish(Throwable exception) {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    //String action = context.getString(R.string.toast_pub_failed,(Object[]) additionalArgs);
-    String action = context.getString(R.string.toast_pub_failed);
-    c.addAction(action);
-    Notify.toast(context, action, Toast.LENGTH_SHORT);
-
+    try {
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      //String action = context.getString(R.string.toast_pub_failed,(Object[]) additionalArgs);
+      String action = context.getString(R.string.toast_pub_failed);
+      c.addAction(action);
+      Notify.toast(context, action, Toast.LENGTH_SHORT);
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -261,12 +292,16 @@ public class ActionListener implements IMqttActionListener {
    * @param exception This argument is not used
    */
   private void subscribe(Throwable exception) {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    String action = context.getString(R.string.toast_sub_failed,
-            (Object[]) additionalArgs);
-    c.addAction(action);
-    Notify.toast(context, action, Toast.LENGTH_SHORT);
-
+    try {
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      String action = context.getString(R.string.toast_sub_failed,
+              (Object[]) additionalArgs);
+      c.addAction(action);
+      Notify.toast(context, action, Toast.LENGTH_SHORT);
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -274,10 +309,14 @@ public class ActionListener implements IMqttActionListener {
    * @param exception This argument is not used
    */
   private void disconnect(Throwable exception) {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    c.changeConnectionStatus(ConnectionStatus.DISCONNECTED);
-    c.addAction("Disconnect Failed - an error occured");
-
+    try{
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      c.changeConnectionStatus(ConnectionStatus.DISCONNECTED);
+      c.addAction("Disconnect Failed - an error occured");
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -285,10 +324,14 @@ public class ActionListener implements IMqttActionListener {
    * @param exception This argument is not used
    */
   private void connect(Throwable exception) {
-    Connection c = Connections.getInstance(context).getConnection(clientHandle);
-    c.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
-    c.addAction("Client failed to connect");
-
+    try{
+      Connection c = Connections.getInstance(context).getConnection(clientHandle);
+      c.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
+      c.addAction("Client failed to connect");
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
 }

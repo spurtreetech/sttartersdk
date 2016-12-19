@@ -40,43 +40,47 @@ public class Notify {
    * @param notificationTitle The resource reference to the notification title
    */
   static void notifcation(Context context, String messageString, Intent intent, int notificationTitle) {
+    try {
+      //Get the notification manage which we will use to display the notification
+      String ns = Context.NOTIFICATION_SERVICE;
+      NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
 
-    //Get the notification manage which we will use to display the notification
-    String ns = Context.NOTIFICATION_SERVICE;
-    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
+      Calendar.getInstance().getTime().toString();
 
-    Calendar.getInstance().getTime().toString();
+      long when = System.currentTimeMillis();
 
-    long when = System.currentTimeMillis();
+      //get the notification title from the application's strings.xml file
+      CharSequence contentTitle = context.getString(notificationTitle);
 
-    //get the notification title from the application's strings.xml file
-    CharSequence contentTitle = context.getString(notificationTitle);
+      //the message that will be displayed as the ticker
+      String ticker = contentTitle + " " + messageString;
 
-    //the message that will be displayed as the ticker
-    String ticker = contentTitle + " " + messageString;
+      //build the pending intent that will start the appropriate activity
+      PendingIntent pendingIntent = PendingIntent.getActivity(context,
+              ActivityConstants.showHistory, intent, 0);
 
-    //build the pending intent that will start the appropriate activity
-    PendingIntent pendingIntent = PendingIntent.getActivity(context,
-            ActivityConstants.showHistory, intent, 0);
+      //build the notification
+      Builder notificationCompat = new Builder(context);
+      notificationCompat.setAutoCancel(true)
+              .setContentTitle(contentTitle)
+              .setContentIntent(pendingIntent)
+              .setContentText(messageString)
+              .setTicker(ticker)
+              .setWhen(when)
+              .setGroup("com.spurtreetech.sttarter.lib.helper");
+      // .setSmallIcon(R.mipmap.autosense);
 
-    //build the notification
-    Builder notificationCompat = new Builder(context);
-    notificationCompat.setAutoCancel(true)
-            .setContentTitle(contentTitle)
-            .setContentIntent(pendingIntent)
-            .setContentText(messageString)
-            .setTicker(ticker)
-            .setWhen(when)
-            .setGroup("com.spurtreetech.sttarter.lib.helper");
-    // .setSmallIcon(R.mipmap.autosense);
-
-    Notification notification = notificationCompat.build();
-    //display the notification
+      Notification notification = notificationCompat.build();
+      //display the notification
     /*if (((Boolean)BuildUtils.getBuildConfigValue(context, "DEBUG"))) {
         // mNotificationManager.notify(MessageID, notification);
         // uncomment below code to receive multiple notifications
         //MessageID++;
     }*/
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**

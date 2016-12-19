@@ -33,16 +33,14 @@ import java.util.ArrayList;
 public class STTProviderHelper {
 
 
-
     public synchronized void insertTopics(ArrayList<Group> data, boolean subscribedTopics) {
+        try {
+            //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
 
-        //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
+            ArrayList<TopicsContentValues> tcv = new ArrayList<>();
+            int count = 0;
+            for (Group tempGroup : data) {
 
-        ArrayList<TopicsContentValues> tcv = new ArrayList<>();
-        int count = 0;
-        for (Group tempGroup : data) {
-
-            try {
 
                 TopicsSelection where = new TopicsSelection();
                 where.topicName(tempGroup.getTopic());
@@ -52,10 +50,10 @@ public class STTProviderHelper {
                 TopicsContentValues temp = new TopicsContentValues();
 
                 // If already present then update else insert
-                if(c!=null && c.getCount()>0) {
+                if (c != null && c.getCount() > 0) {
 
                     // update subscribed status of topics from "mytopics" API
-                    if(subscribedTopics==true) {
+                    if (subscribedTopics == true) {
                         temp.putTopicIsSubscribed(subscribedTopics);
                         temp.putTopicIsPublic((tempGroup.getIs_public() == 1) ? true : false);
 
@@ -81,7 +79,7 @@ public class STTProviderHelper {
 
                     temp.putTopicMeta(sttJson);
                     temp.putTopicGroupMembers(groupMembersJson);
-                    if(subscribedTopics==true)
+                    if (subscribedTopics == true)
                         temp.putTopicIsSubscribed(subscribedTopics);
 
                     tcv.add(temp);
@@ -90,76 +88,66 @@ public class STTProviderHelper {
                 }
 
 
-            } catch (STTarterManager.ContextNotInitializedException e) {
-                e.printStackTrace();
-            }
-
-            // Bulk insert all rows that do not exist
-            if(count>0) {
-                ContentValues[] cv = new ContentValues[count];
-                count = 0;
-                for (TopicsContentValues tempTcv : tcv) {
-                    cv[count] = tempTcv.values();
-                }
-                try {
+                // Bulk insert all rows that do not exist
+                if (count > 0) {
+                    ContentValues[] cv = new ContentValues[count];
+                    count = 0;
+                    for (TopicsContentValues tempTcv : tcv) {
+                        cv[count] = tempTcv.values();
+                    }
                     STTarterManager.getInstance().getContext().getContentResolver().bulkInsert(TopicsColumns.CONTENT_URI, cv);
-                } catch (STTarterManager.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
-            }
 
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public synchronized void insertMessage(PayloadData pd, boolean is_sender, boolean is_delivered) {
-
-        TopicsSelection whereTopics = new TopicsSelection();
-        whereTopics.topicName(pd.getPayload().getTopic());
-        TopicsCursor tc = null;
-        try {
+        try{
+            TopicsSelection whereTopics = new TopicsSelection();
+            whereTopics.topicName(pd.getPayload().getTopic());
+            TopicsCursor tc = null;
             tc = whereTopics.query(STTarterManager.getInstance().getContext());
             tc.moveToFirst();
-        } catch (STTarterManager.ContextNotInitializedException e) {
-            e.printStackTrace();
-        }
 
-        Log.d("ContentProvider><><>>", pd.getPayload().toString());
+            Log.d("ContentProvider><><>>", pd.getPayload().toString());
 
-        MessagesContentValues mcv = new MessagesContentValues();
-        mcv.putMessageText(pd.getPayload().getMessage());
-        mcv.putMessageTopic(pd.getPayload().getTopic());
-        mcv.putMessageType("message");
-        mcv.putIsSender(is_sender);
-        mcv.putIsDelivered(is_delivered);
-        mcv.putIsRead(is_sender ? true : false);
-        mcv.putMessageTimestamp(Long.parseLong(pd.getTimestamp()));
-        mcv.putMessageTopicId(tc.getId());
-        mcv.putUnixTimestamp(Long.parseLong(pd.getTimestamp()));
-        mcv.putMessageFrom(pd.getFrom());
-        mcv.putMessageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
-        mcv.putFileType((pd.getFile_type() == null) ? "none" : pd.getFile_type());
-        mcv.putFileUrl((pd.getFile_url() == null) ? "none" : pd.getFile_url());
+            MessagesContentValues mcv = new MessagesContentValues();
+            mcv.putMessageText(pd.getPayload().getMessage());
+            mcv.putMessageTopic(pd.getPayload().getTopic());
+            mcv.putMessageType("message");
+            mcv.putIsSender(is_sender);
+            mcv.putIsDelivered(is_delivered);
+            mcv.putIsRead(is_sender ? true : false);
+            mcv.putMessageTimestamp(Long.parseLong(pd.getTimestamp()));
+            mcv.putMessageTopicId(tc.getId());
+            mcv.putUnixTimestamp(Long.parseLong(pd.getTimestamp()));
+            mcv.putMessageFrom(pd.getFrom());
+            mcv.putMessageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
+            mcv.putFileType((pd.getFile_type() == null) ? "none" : pd.getFile_type());
+            mcv.putFileUrl((pd.getFile_url() == null) ? "none" : pd.getFile_url());
 
-        try {
             mcv.insert(STTarterManager.getInstance().getContext());
             // Once message inserted update the last active timestamp for that topic
             updateTopicActiveTime(pd);
             Log.d(getClass().getSimpleName(), "Inserted Message: " + pd.getPayload().getMessage());
-        } catch (STTarterManager.ContextNotInitializedException e) {
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }
 
 
     public synchronized void insertUsers(ArrayList<User> data) {
+        try{
+            //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
 
-        //TopicsContentValues[] tcv = new TopicsContentValues[data.size()];
-
-        ArrayList<UsersContentValues> tcv = new ArrayList<>();
-        int count = 0;
-        for (User tempUser: data) {
-
-            try {
+            ArrayList<UsersContentValues> tcv = new ArrayList<>();
+            int count = 0;
+            for (User tempUser: data) {
 
                 UsersSelection where = new UsersSelection();
                 where.usersUserId(tempUser.getStt_id());
@@ -204,39 +192,34 @@ public class STTProviderHelper {
 
                 }
 
-
-            } catch (STTarterManager.ContextNotInitializedException e) {
-                e.printStackTrace();
-            }
-
-            // Bulk insert all rows that do not exist
-            if(count>0) {
-                ContentValues[] cv = new ContentValues[count];
-                count = 0;
-                for (UsersContentValues tempTcv : tcv) {
-                    cv[count] = tempTcv.values();
-                }
-                try {
+                // Bulk insert all rows that do not exist
+                if(count>0) {
+                    ContentValues[] cv = new ContentValues[count];
+                    count = 0;
+                    for (UsersContentValues tempTcv : tcv) {
+                        cv[count] = tempTcv.values();
+                    }
                     STTarterManager.getInstance().getContext().getContentResolver().bulkInsert(UsersColumns.CONTENT_URI, cv);
-                } catch (STTarterManager.ContextNotInitializedException e) {
-                    e.printStackTrace();
                 }
-            }
 
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
 
     public void updateMessageSentStatus(PayloadData pd) {
+        try{
+            MessagesSelection where = new MessagesSelection();
+            where.messageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
 
-        MessagesSelection where = new MessagesSelection();
-        where.messageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
+            MessagesContentValues mcv = new MessagesContentValues();
+            mcv.putMessageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
 
-        MessagesContentValues mcv = new MessagesContentValues();
-        mcv.putMessageHash(getMessageHash(pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp())));
-        try {
             mcv.update(STTarterManager.getInstance().getContext(), where);
-        } catch (STTarterManager.ContextNotInitializedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
