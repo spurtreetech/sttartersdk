@@ -17,7 +17,8 @@ public class STTKeys {
     public static String STTARTER_APP_KEY = "sttarter_app_key";
     public static String STTARTER_APP_SECRET = "sttarter_secret";
 
-    private static String BASE_HOST = "http://52.220.92.135" ;
+    public static String SERVER_URL = "52.220.92.135";
+    private static String BASE_HOST = "http://"+SERVER_URL ;
 
     private static String HOST = BASE_HOST+":3000/";  //"http://10.1.3.194:3000/"  //http://10.1.3.33:3000/  // http://sttarter.com/
     public static String BASE_URL = HOST + "app/mqtt/";
@@ -41,7 +42,7 @@ public class STTKeys {
     public static String ALL_TOPICS_LIST = "ALL_TOPICS_LIST";
 
     /* chat server url */
-    public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";
+      //"10.1.3.54";
     public static String PORT = "1883";
     public static boolean CLEAN_SESSION = false;
     public static String NOTIFICATION_TOPICS = "NOTIFICATION_TOPICS";

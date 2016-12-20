@@ -84,71 +84,77 @@ public class STTGeneralRoutines {
         return new Response.Listener<MyTopicsInfo>() {
             @Override
             public void onResponse(MyTopicsInfo response) {
-
-                String subscribedTopics = "";
-                boolean clientConnected = false;
                 try {
-                    clientConnected = Connections.getInstance(STTarter.getInstance().getContext()).getConnection(STTarter.getInstance().getClientHandle()).isConnected();
-                } catch (STTarter.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
-
-                for(Topic tempTopic : response.getTopics()) {
-                    // TODO subscribe all topics
-                    Log.d("getMyTopics()", tempTopic.getTopic());
-                    //STTarter.getInstance().subscribe(tempTopic.getTopic());
-                    Log.d(getClass().getCanonicalName(), "subscribed to - " + tempTopic.getTopic());
-                    if(clientConnected) {
-                        STTarter.getInstance().subscribe(tempTopic.getTopic());
+                    String subscribedTopics = "";
+                    boolean clientConnected = false;
+                    try {
+                        clientConnected = Connections.getInstance(STTarter.getInstance().getContext()).getConnection(STTarter.getInstance().getClientHandle()).isConnected();
+                    } catch (STTarter.ContextNotInitializedException e) {
+                        e.printStackTrace();
                     }
 
-                    if(!tempTopic.getType().equals("master")) {
-                        if(subscribedTopics.equals("")) {subscribedTopics = tempTopic.getTopic();}
-                        else {subscribedTopics += ","+tempTopic.getTopic();}
-                    }
+                    for (Topic tempTopic : response.getTopics()) {
+                        // TODO subscribe all topics
+                        Log.d("getMyTopics()", tempTopic.getTopic());
+                        //STTarter.getInstance().subscribe(tempTopic.getTopic());
+                        Log.d(getClass().getCanonicalName(), "subscribed to - " + tempTopic.getTopic());
+                        if (clientConnected) {
+                            STTarter.getInstance().subscribe(tempTopic.getTopic());
+                        }
 
-                    if (tempTopic.getType().contains("org")){
-                        SharedPreferences sp = null;
-                        try {
-                            sp = STTarter.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor spEditor = sp.edit();
+                        if (!tempTopic.getType().equals("master")) {
+                            if (subscribedTopics.equals("")) {
+                                subscribedTopics = tempTopic.getTopic();
+                            } else {
+                                subscribedTopics += "," + tempTopic.getTopic();
+                            }
+                        }
 
-                            spEditor.putString(STTKeys.BUZZ_TOPIC,tempTopic.getTopic());
-                            Log.d("Buzz_Organization",tempTopic.getTopic());
+                        if (tempTopic.getType().contains("org")) {
+                            SharedPreferences sp = null;
+                            try {
+                                sp = STTarter.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor spEditor = sp.edit();
 
-                            spEditor.commit();
+                                spEditor.putString(STTKeys.BUZZ_TOPIC, tempTopic.getTopic());
+                                Log.d("Buzz_Organization", tempTopic.getTopic());
 
-                        } catch (STTarter.ContextNotInitializedException e) {
-                            e.printStackTrace();
+                                spEditor.commit();
+
+                            } catch (STTarter.ContextNotInitializedException e) {
+                                e.printStackTrace();
+                            }
+
                         }
 
                     }
 
-                }
+                    final MyTopicsInfo myTopicsResponse = response;
 
-                final MyTopicsInfo myTopicsResponse = response;
+                    try {
+                        //ph.deleteAllTopics();
+                        Thread insertThread = new Thread() {
+                            public void run() {
+                                STTProviderHelper ph = new STTProviderHelper();
+                                ph.insertTopics(myTopicsResponse.getTopics(), true);
+                            }
+                        };
+                        insertThread.start();
+                    } catch (SQLiteConstraintException e) {
+                        e.printStackTrace();
+                    }
 
-                try {
-                    //ph.deleteAllTopics();
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            ph.insertTopics(myTopicsResponse.getTopics(), true);
-                        }
-                    };
-                    insertThread.start();
-                } catch (SQLiteConstraintException e) {
+                    // store the subscribed topics as a string in shared preferences
+                    //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
+                    PreferenceHelper.getSharedPreferenceEditor().commit();
+                    //}
+
+                    getAllTopics();
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
-                PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
-                PreferenceHelper.getSharedPreferenceEditor().commit();
-                //}
-
-                getAllTopics();
-
             }
         };
     }
@@ -187,7 +193,7 @@ public class STTGeneralRoutines {
         return new Response.Listener<AllTopicsInfo>() {
             @Override
             public void onResponse(AllTopicsInfo response) {
-
+                try{
                 String subscribedTopics = "";
                 boolean clientConnected = false;
                 try {
@@ -235,6 +241,9 @@ public class STTGeneralRoutines {
                 //}
                 getAllUsers();
                 //getMyTopics();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -274,36 +283,39 @@ public class STTGeneralRoutines {
         return new Response.Listener<AllUsersInfo>() {
             @Override
             public void onResponse(AllUsersInfo response) {
-
-                Gson gson = new Gson();
-                String sSS = gson.toJson(response);
-
-                Log.d("UserInformations",sSS);
-
-                //STTProviderHelper ph = new STTProviderHelper();
                 try {
-                    //ph.deleteAllTopics();
-                    final AllUsersInfo allUsersInfo = response;
+                    Gson gson = new Gson();
+                    String sSS = gson.toJson(response);
 
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            ph.insertUsers(allUsersInfo.getUsers());
-                        }
-                    };
-                    insertThread.start();
+                    Log.d("UserInformations", sSS);
 
-                } catch (SQLiteConstraintException e) {
-                    e.printStackTrace();
-                }
+                    //STTProviderHelper ph = new STTProviderHelper();
+                    try {
+                        //ph.deleteAllTopics();
+                        final AllUsersInfo allUsersInfo = response;
 
-                // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                        Thread insertThread = new Thread() {
+                            public void run() {
+                                STTProviderHelper ph = new STTProviderHelper();
+                                ph.insertUsers(allUsersInfo.getUsers());
+                            }
+                        };
+                        insertThread.start();
+
+                    } catch (SQLiteConstraintException e) {
+                        e.printStackTrace();
+                    }
+
+                    // store the subscribed topics as a string in shared preferences
+                    //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
                 /*PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();*/
-                //}
+                    //}
 
-                //getMyTopics();
+                    //getMyTopics();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
