@@ -17,7 +17,7 @@ public class STTKeys {
     public static String STTARTER_APP_KEY = "sttarter_app_key";
     public static String STTARTER_APP_SECRET = "sttarter_secret";
 
-    private static String BASE_HOST = "http://sttarter.com";  //http://52.220.92.135
+    private static String BASE_HOST = "http://52.220.92.135" ;
 
     private static String HOST = BASE_HOST+":3000/";  //"http://10.1.3.194:3000/"  //http://10.1.3.33:3000/  // http://sttarter.com/
     public static String BASE_URL = HOST + "app/mqtt/";
