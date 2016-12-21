@@ -13,6 +13,7 @@
 package com.spurtreetech.sttarter.lib.helper;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.spurtreetech.sttarter.lib.R;
@@ -46,8 +47,6 @@ class ActionListener implements IMqttActionListener {
         /** UnSubscribe Action **/
         UNSUBSCRIBE
     }
-
-    STTGeneralRoutines gr = new STTGeneralRoutines();
 
     /**
      * The {@link Action} that is associated with this instance of
@@ -202,7 +201,7 @@ class ActionListener implements IMqttActionListener {
         c.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
         c.addAction("Client Connected");
         Notify.toast(context, "Client Connected", Toast.LENGTH_SHORT);
-
+        Log.d(">>>","OnConnect>>");
         //if(!PreferenceHelper.getSharedPreference().getString(STTKeys.ALL_TOPICS_LIST,"").equals("")) {
         STTGeneralRoutines sttGeneralRoutines = new STTGeneralRoutines();
         sttGeneralRoutines.subscribeInitalize();

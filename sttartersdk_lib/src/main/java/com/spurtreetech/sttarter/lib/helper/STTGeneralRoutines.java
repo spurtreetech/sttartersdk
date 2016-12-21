@@ -444,16 +444,16 @@ public class STTGeneralRoutines {
         return new Response.Listener<AuthInfo>() {
             @Override
             public void onResponse(AuthInfo response) {
-
-                if(!response.getToken().equals(null)) {
-                    // store the subscribed topics as a string in shared preferences
-                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.AUTH_TOKEN, response.getToken());
-                    PreferenceHelper.getSharedPreferenceEditor().commit();
-                    Log.d("STTGeneralRoutines", response.getToken());
-                } else {
-                    // TODO try another time or go back to home screen
-                    Log.d(getClass().getCanonicalName(), "response - login credentials might be wrong: 401 unauthorized");
-                }
+                try {
+                    if (!response.getToken().equals(null)) {
+                        // store the subscribed topics as a string in shared preferences
+                        PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.AUTH_TOKEN, response.getToken());
+                        PreferenceHelper.getSharedPreferenceEditor().commit();
+                        Log.d("STTGeneralRoutines", response.getToken());
+                    } else {
+                        // TODO try another time or go back to home screen
+                        Log.d(getClass().getCanonicalName(), "response - login credentials might be wrong: 401 unauthorized");
+                    }
                 /*
                 if(response.getStatus() == 200) {
                     // store the subscribed topics as a string in shared preferences
@@ -468,6 +468,9 @@ public class STTGeneralRoutines {
                     Log.d(getClass().getCanonicalName(), "response - some error occured");
                 }
                 */
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }

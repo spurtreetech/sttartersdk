@@ -51,7 +51,6 @@ public class STTarter {
     private String appSecret;
     private RequestQueue mRequestQueue;
     private String clientHandle;
-    STTGeneralRoutines sttgr;
     private boolean isApplicationInBackground = true;
     private Connection connection;
     SharedPreferences sp;
@@ -133,9 +132,6 @@ public class STTarter {
         Log.d("STTarter", STTKeys.USER_ID + " : " + sp.getString(STTKeys.USER_ID, ""));
 
         Log.d("STTarter", "Context - " + this.context);
-        sttgr = new STTGeneralRoutines();
-        //sttgr.retieveNewToken(this.appId, this.appSecret);
-        //sttgr.retrieveNewToken();
 
         this.userId = userID;
 
@@ -442,10 +438,6 @@ public class STTarter {
             e.printStackTrace();
         }
     }
-
-    /*public void initChat(String requestingUser, String requestedUser) {
-        sttgr.initChat(requestingUser, requestedUser);
-    }*/
 
     public String[] getSubscribedTopics() {
         String subscribedString = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"");
