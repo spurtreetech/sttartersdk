@@ -59,10 +59,8 @@ public class STTGeneralRoutines {
         if (duration >= MAX_DURATION) {
             if (PreferenceHelper.getSharedPreference()!=null) {
                 // TODO get all topics from server and subscribe to all of them
-                if (PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF, 0) != 0) {
                     PreferenceHelper.getSharedPreferenceEditor().putLong(STTKeys.CHECK_DIFF, unixTime).commit();
                     getMyTopics();
-                }
             }
         }
 
