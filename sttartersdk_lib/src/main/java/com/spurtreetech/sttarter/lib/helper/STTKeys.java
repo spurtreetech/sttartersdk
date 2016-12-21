@@ -71,6 +71,7 @@ public class STTKeys {
     public static int PERFECT_RESPONSE = 555;
 
     public static String BUZZ_TOPIC = "buzz_topic";
+    public static String CHECK_DIFF = "check_diff";
 
 
 }

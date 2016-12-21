@@ -3,6 +3,7 @@ package com.spurtreetech.sttarter.lib.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteConstraintException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -19,9 +20,14 @@ import com.spurtreetech.sttarter.lib.helper.models.SubscribeInfo;
 import com.spurtreetech.sttarter.lib.helper.models.Topic;
 import com.spurtreetech.sttarter.lib.provider.STTProviderHelper;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Created by RahulT on 18-06-2015.
@@ -43,8 +49,24 @@ public class STTGeneralRoutines {
         //String[] topics = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").split(",");
         //STTarter.getInstance().unsubscribe(topics);
 
-        // TODO get all topics from server and subscribe to all of them
-        getMyTopics();
+        Date dateTimeNow = Calendar.getInstance().getTime();
+        long unixTime = dateTimeNow.getTime() / 1000L;
+        long MAX_DURATION = MILLISECONDS.convert(2, MINUTES);
+        Date time=new Date(PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF,0)*1000);
+
+        long duration = dateTimeNow.getTime() - time.getTime();
+
+        if (duration >= MAX_DURATION) {
+            if (PreferenceHelper.getSharedPreference()!=null) {
+                // TODO get all topics from server and subscribe to all of them
+                if (PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF, 0) != 0) {
+                    PreferenceHelper.getSharedPreferenceEditor().putLong(STTKeys.CHECK_DIFF, unixTime).commit();
+                    getMyTopics();
+                }
+            }
+        }
+
+
         //getAllTopics();
 
 
