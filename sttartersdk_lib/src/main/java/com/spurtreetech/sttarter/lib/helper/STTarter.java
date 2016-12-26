@@ -870,13 +870,17 @@ public class STTarter {
         return this.mLruBitmapCache;
     }
 
-    public void logout() {
+    public void logout(Context context) {
         try{
-        STTarter.getInstance().client.stopService();
+         this.context = context;
+            if (client!=null && client.isConnected())
+                client.disconnect();
         STTProviderHelper ph = new STTProviderHelper();
         ph.emptyAllTable();
 //STTarter.getInstance().getContext().getDatabasePath(STTSQLiteOpenHelper.DATABASE_FILE_NAME).delete();
-        PreferenceHelper.getSharedPreferenceEditor().clear().commit();
+            sp = context.getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+            spEditor = sp.edit();
+            spEditor.clear().commit();
         }
         catch (Exception e){
             e.printStackTrace();
