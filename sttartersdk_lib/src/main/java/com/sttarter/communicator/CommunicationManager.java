@@ -37,9 +37,14 @@ import com.sttarter.provider.STTProviderHelper;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Created by Shahbaz on 14-11-2016.
@@ -72,7 +77,20 @@ public class CommunicationManager {
         //STTarterManager.getInstance().unsubscribe(topics);
 
         // TODO get all topics from server and subscribe to all of them
-        getAllTopics();
+        Date dateTimeNow = Calendar.getInstance().getTime();
+        long unixTime = dateTimeNow.getTime() / 1000L;
+        long MAX_DURATION = MILLISECONDS.convert(2, MINUTES);
+        Date time=new Date(PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF,0)*1000);
+
+        long duration = dateTimeNow.getTime() - time.getTime();
+
+        if (duration >= MAX_DURATION) {
+            if (PreferenceHelper.getSharedPreference()!=null) {
+                // TODO get all topics from server and subscribe to all of them
+                PreferenceHelper.getSharedPreferenceEditor().putLong(STTKeys.CHECK_DIFF, unixTime).commit();
+                getMyTopics();
+            }
+        }
 
 
     }
@@ -112,71 +130,77 @@ public class CommunicationManager {
         return new Response.Listener<MyTopicsInfo>() {
             @Override
             public void onResponse(MyTopicsInfo response) {
-
-                String subscribedTopics = "";
-                boolean clientConnected = false;
                 try {
-                    clientConnected = Connections.getInstance(STTarterManager.getInstance().getContext()).getConnection(STTarterManager.getInstance().getClientHandle()).isConnected();
-                } catch (STTarterManager.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
-
-                for(Group tempGroup : response.getTopics()) {
-                    // TODO subscribe all topics
-                    Log.d("getMyTopics()", tempGroup.getTopic());
-                    //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
-                    Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
-                    if(clientConnected) {
-                        STTarterManager.getInstance().subscribe(tempGroup.getTopic());
+                    String subscribedTopics = "";
+                    boolean clientConnected = false;
+                    try {
+                        clientConnected = Connections.getInstance(STTarterManager.getInstance().getContext()).getConnection(STTarterManager.getInstance().getClientHandle()).isConnected();
+                    } catch (STTarterManager.ContextNotInitializedException e) {
+                        e.printStackTrace();
                     }
 
-                    if(!tempGroup.getType().equals("master")) {
-                        if(subscribedTopics.equals("")) {subscribedTopics = tempGroup.getTopic();}
-                        else {subscribedTopics += ","+ tempGroup.getTopic();}
-                    }
+                    for (Group tempGroup : response.getTopics()) {
+                        // TODO subscribe all topics
+                        Log.d("getMyTopics()", tempGroup.getTopic());
+                        //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
+                        Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
+                        if (clientConnected) {
+                            STTarterManager.getInstance().subscribe(tempGroup.getTopic());
+                        }
 
-                    if (tempGroup.getType().contains("org")){
-                        SharedPreferences sp = null;
-                        try {
-                            sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor spEditor = sp.edit();
+                        if (!tempGroup.getType().equals("master")) {
+                            if (subscribedTopics.equals("")) {
+                                subscribedTopics = tempGroup.getTopic();
+                            } else {
+                                subscribedTopics += "," + tempGroup.getTopic();
+                            }
+                        }
 
-                            spEditor.putString(STTKeys.BUZZ_TOPIC, tempGroup.getTopic());
-                            Log.d("Buzz_Organization", tempGroup.getTopic());
+                        if (tempGroup.getType().contains("org")) {
+                            SharedPreferences sp = null;
+                            try {
+                                sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor spEditor = sp.edit();
 
-                            spEditor.commit();
+                                spEditor.putString(STTKeys.BUZZ_TOPIC, tempGroup.getTopic());
+                                Log.d("Buzz_Organization", tempGroup.getTopic());
 
-                        } catch (STTarterManager.ContextNotInitializedException e) {
-                            e.printStackTrace();
+                                spEditor.commit();
+
+                            } catch (STTarterManager.ContextNotInitializedException e) {
+                                e.printStackTrace();
+                            }
+
                         }
 
                     }
 
+                    final MyTopicsInfo myTopicsResponse = response;
+
+                    try {
+                        //ph.deleteAllTopics();
+                        Thread insertThread = new Thread() {
+                            public void run() {
+                                STTProviderHelper ph = new STTProviderHelper();
+                                //ph.deleteAllTopics();
+                                ph.insertTopics(myTopicsResponse.getTopics(), true);
+                            }
+                        };
+                        insertThread.start();
+                    } catch (SQLiteConstraintException e) {
+                        e.printStackTrace();
+                    }
+
+                    // store the subscribed topics as a string in shared preferences
+                    //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
+                    PreferenceHelper.getSharedPreferenceEditor().commit();
+                    //}
+                    getAllUsers();
                 }
-
-                final MyTopicsInfo myTopicsResponse = response;
-
-                try {
-                    //ph.deleteAllTopics();
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            //ph.deleteAllTopics();
-                            ph.insertTopics(myTopicsResponse.getTopics(), true);
-                        }
-                    };
-                    insertThread.start();
-                } catch (SQLiteConstraintException e) {
+                catch (Exception e){
                     e.printStackTrace();
                 }
-
-                // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
-                PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.SUBSCRIBED_TOPICS, subscribedTopics);
-                PreferenceHelper.getSharedPreferenceEditor().commit();
-                //}
-                getAllUsers();
-
             }
         };
     }
@@ -216,7 +240,7 @@ public class CommunicationManager {
         return new Response.Listener<AllTopicsInfo>() {
             @Override
             public void onResponse(AllTopicsInfo response) {
-
+                try{
                 String subscribedTopics = "";
                 boolean clientConnected = false;
                 try {
@@ -264,6 +288,10 @@ public class CommunicationManager {
                 //}
 
                 getMyTopics();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -304,7 +332,7 @@ public class CommunicationManager {
         return new Response.Listener<UserList>() {
             @Override
             public void onResponse(UserList response) {
-
+                try{
                 Gson gson = new Gson();
                 String sSS = gson.toJson(response);
 
@@ -334,6 +362,10 @@ public class CommunicationManager {
                 //}
 
                 //getMyTopics();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -399,7 +431,7 @@ public class CommunicationManager {
                         subscribeTopicWithoutCallback(false,groupName, STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
                     }
 
-                } catch (SQLiteConstraintException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 finally {
@@ -696,9 +728,13 @@ public class CommunicationManager {
         return new Response.Listener<STTResponse>() {
             @Override
             public void onResponse(STTResponse response) {
-                Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
-                if (callBack)
-                    sttSuccessListener.Response(response);
+                try {
+                    Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
+                    if (callBack)
+                        sttSuccessListener.Response(response);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }
