@@ -1,5 +1,6 @@
 package com.spurtreetech.sttarter.lib.helper;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteConstraintException;
@@ -48,6 +49,9 @@ public class STTGeneralRoutines {
         // get all subscribed topics
         //String[] topics = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").split(",");
         //STTarter.getInstance().unsubscribe(topics);
+        ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
+
+        if (!memoryInfo.lowMemory) {
 
         Date dateTimeNow = Calendar.getInstance().getTime();
         long unixTime = dateTimeNow.getTime() / 1000L;
@@ -63,11 +67,8 @@ public class STTGeneralRoutines {
                     getMyTopics();
             }
         }
-
-
-        //getAllTopics();
-
-
+        // Do memory intensive work ...
+        }
     }
 
     public void getMyTopics() {
@@ -631,5 +632,19 @@ public class STTGeneralRoutines {
             }
         };
     }
+
+    // Get a MemoryInfo object for the device's current memory status.
+    public ActivityManager.MemoryInfo getAvailableMemory() {
+        ActivityManager activityManager = null;
+        try {
+            activityManager = (ActivityManager) STTarter.getInstance().getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        } catch (STTarter.ContextNotInitializedException e) {
+            e.printStackTrace();
+        }
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
+    }
+
 
 }
