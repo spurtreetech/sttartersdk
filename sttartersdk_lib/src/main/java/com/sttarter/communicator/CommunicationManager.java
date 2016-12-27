@@ -1,5 +1,6 @@
 package com.sttarter.communicator;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteConstraintException;
@@ -76,23 +77,27 @@ public class CommunicationManager {
         //String[] topics = PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").split(",");
         //STTarterManager.getInstance().unsubscribe(topics);
 
-        // TODO get all topics from server and subscribe to all of them
-        Date dateTimeNow = Calendar.getInstance().getTime();
-        long unixTime = dateTimeNow.getTime() / 1000L;
-        long MAX_DURATION = MILLISECONDS.convert(2, MINUTES);
-        Date time=new Date(PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF,0)*1000);
+        ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
+        if (memoryInfo!=null) {
+            if (!memoryInfo.lowMemory || !STTarterManager.getInstance().isApplicationInBackground()) {
 
-        long duration = dateTimeNow.getTime() - time.getTime();
-
-        if (duration >= MAX_DURATION) {
-            if (PreferenceHelper.getSharedPreference()!=null) {
                 // TODO get all topics from server and subscribe to all of them
-                PreferenceHelper.getSharedPreferenceEditor().putLong(STTKeys.CHECK_DIFF, unixTime).commit();
-                getMyTopics();
+                Date dateTimeNow = Calendar.getInstance().getTime();
+                long unixTime = dateTimeNow.getTime() / 1000L;
+                long MAX_DURATION = MILLISECONDS.convert(2, MINUTES);
+                Date time = new Date(PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF, 0) * 1000);
+
+                long duration = dateTimeNow.getTime() - time.getTime();
+
+                if (duration >= MAX_DURATION) {
+                    if (PreferenceHelper.getSharedPreference() != null) {
+                        // TODO get all topics from server and subscribe to all of them
+                        PreferenceHelper.getSharedPreferenceEditor().putLong(STTKeys.CHECK_DIFF, unixTime).commit();
+                        getAllTopics();
+                    }
+                }
             }
         }
-
-
     }
 
     protected void getMyTopics() {
@@ -130,7 +135,7 @@ public class CommunicationManager {
         return new Response.Listener<MyTopicsInfo>() {
             @Override
             public void onResponse(MyTopicsInfo response) {
-                try {
+                try{
                     String subscribedTopics = "";
                     boolean clientConnected = false;
                     try {
@@ -139,24 +144,21 @@ public class CommunicationManager {
                         e.printStackTrace();
                     }
 
-                    for (Group tempGroup : response.getTopics()) {
+                    for(Group tempGroup : response.getTopics()) {
                         // TODO subscribe all topics
                         Log.d("getMyTopics()", tempGroup.getTopic());
                         //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                         Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
-                        if (clientConnected) {
+                        if(clientConnected) {
                             STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                         }
 
-                        if (!tempGroup.getType().equals("master")) {
-                            if (subscribedTopics.equals("")) {
-                                subscribedTopics = tempGroup.getTopic();
-                            } else {
-                                subscribedTopics += "," + tempGroup.getTopic();
-                            }
+                        if(!tempGroup.getType().equals("master")) {
+                            if(subscribedTopics.equals("")) {subscribedTopics = tempGroup.getTopic();}
+                            else {subscribedTopics += ","+ tempGroup.getTopic();}
                         }
 
-                        if (tempGroup.getType().contains("org")) {
+                        if (tempGroup.getType().contains("org")){
                             SharedPreferences sp = null;
                             try {
                                 sp = STTarterManager.getInstance().getContext().getSharedPreferences(STTKeys.STTARTER_PREFERENCES, Context.MODE_PRIVATE);
@@ -240,54 +242,57 @@ public class CommunicationManager {
         return new Response.Listener<AllTopicsInfo>() {
             @Override
             public void onResponse(AllTopicsInfo response) {
-                try{
-                String subscribedTopics = "";
-                boolean clientConnected = false;
                 try {
-                    clientConnected = Connections.getInstance(STTarterManager.getInstance().getContext()).getConnection(STTarterManager.getInstance().getClientHandle()).isConnected();
-                } catch (STTarterManager.ContextNotInitializedException e) {
-                    e.printStackTrace();
-                }
+                    String subscribedTopics = "";
+                    boolean clientConnected = false;
+                    try {
+                        clientConnected = Connections.getInstance(STTarterManager.getInstance().getContext()).getConnection(STTarterManager.getInstance().getClientHandle()).isConnected();
+                    } catch (STTarterManager.ContextNotInitializedException e) {
+                        e.printStackTrace();
+                    }
 
-                for(Group tempGroup : response.getTopics()) {
-                    // TODO subscribe all topics
-                    Log.d("getAllTopics()", tempGroup.getTopic());
-                    //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
-                    Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
-                    if(clientConnected) {
-                        // do not subscribe topics here
+                    for (Group tempGroup : response.getTopics()) {
+                        // TODO subscribe all topics
+                        Log.d("getAllTopics()", tempGroup.getTopic());
                         //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
-                    }
-
-                    if(!tempGroup.getType().equals("master")) {
-                        if(subscribedTopics.equals("")) {subscribedTopics = tempGroup.getTopic();}
-                        else {subscribedTopics += ","+ tempGroup.getTopic();}
-                    }
-                }
-
-                //STTProviderHelper ph = new STTProviderHelper();
-                try {
-                    //ph.deleteAllTopics();
-                    final AllTopicsInfo allTopicsInfo = response;
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            ph.insertTopics(allTopicsInfo.getTopics(), false);
+                        Log.d(getClass().getCanonicalName(), "subscribed to - " + tempGroup.getTopic());
+                        if (clientConnected) {
+                            // do not subscribe topics here
+                            //STTarterManager.getInstance().subscribe(tempGroup.getTopic());
                         }
-                    };
-                    insertThread.start();
 
-                } catch (SQLiteConstraintException e) {
-                    e.printStackTrace();
-                }
+                        if (!tempGroup.getType().equals("master")) {
+                            if (subscribedTopics.equals("")) {
+                                subscribedTopics = tempGroup.getTopic();
+                            } else {
+                                subscribedTopics += "," + tempGroup.getTopic();
+                            }
+                        }
+                    }
 
-                // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
-                PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
-                PreferenceHelper.getSharedPreferenceEditor().commit();
-                //}
+                    //STTProviderHelper ph = new STTProviderHelper();
+                    try {
+                        //ph.deleteAllTopics();
+                        final AllTopicsInfo allTopicsInfo = response;
+                        Thread insertThread = new Thread() {
+                            public void run() {
+                                STTProviderHelper ph = new STTProviderHelper();
+                                ph.insertTopics(allTopicsInfo.getTopics(), false);
+                            }
+                        };
+                        insertThread.start();
 
-                getMyTopics();
+                    } catch (SQLiteConstraintException e) {
+                        e.printStackTrace();
+                    }
+
+                    // store the subscribed topics as a string in shared preferences
+                    //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
+                    PreferenceHelper.getSharedPreferenceEditor().commit();
+                    //}
+
+                    getMyTopics();
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -333,35 +338,35 @@ public class CommunicationManager {
             @Override
             public void onResponse(UserList response) {
                 try{
-                Gson gson = new Gson();
-                String sSS = gson.toJson(response);
+                    Gson gson = new Gson();
+                    String sSS = gson.toJson(response);
 
-                Log.d("UserInformations",sSS);
+                    Log.d("UserInformations",sSS);
 
-                //STTProviderHelper ph = new STTProviderHelper();
-                try {
-                    //ph.deleteAllTopics();
-                    final UserList userList = response;
+                    //STTProviderHelper ph = new STTProviderHelper();
+                    try {
+                        //ph.deleteAllTopics();
+                        final UserList userList = response;
 
-                    Thread insertThread = new Thread() {
-                        public void run() {
-                            STTProviderHelper ph = new STTProviderHelper();
-                            ph.insertUsers(userList.getUsers());
-                        }
-                    };
-                    insertThread.start();
+                        Thread insertThread = new Thread() {
+                            public void run() {
+                                STTProviderHelper ph = new STTProviderHelper();
+                                ph.insertUsers(userList.getUsers());
+                            }
+                        };
+                        insertThread.start();
 
-                } catch (SQLiteConstraintException e) {
-                    e.printStackTrace();
-                }
+                    } catch (SQLiteConstraintException e) {
+                        e.printStackTrace();
+                    }
 
-                // store the subscribed topics as a string in shared preferences
-                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                    // store the subscribed topics as a string in shared preferences
+                    //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
                 /*PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
                 PreferenceHelper.getSharedPreferenceEditor().commit();*/
-                //}
+                    //}
 
-                //getMyTopics();
+                    //getMyTopics();
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -431,7 +436,7 @@ public class CommunicationManager {
                         subscribeTopicWithoutCallback(false,groupName, STTarterManager.getInstance().getUsername(), sttSuccessListener, getErrorListener);
                     }
 
-                } catch (Exception e) {
+                } catch (SQLiteConstraintException e) {
                     e.printStackTrace();
                 }
                 finally {
@@ -605,16 +610,16 @@ public class CommunicationManager {
         return new Response.Listener<AuthInfo>() {
             @Override
             public void onResponse(AuthInfo response) {
-
-                if(!response.getToken().equals(null)) {
-                    // store the subscribed topics as a string in shared preferences
-                    PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.AUTH_TOKEN, response.getToken());
-                    PreferenceHelper.getSharedPreferenceEditor().commit();
-                    Log.d("STTGeneralRoutines", response.getToken());
-                } else {
-                    // TODO try another time or go back to home screen
-                    Log.d(getClass().getCanonicalName(), "response - login credentials might be wrong: 401 unauthorized");
-                }
+                try{
+                    if(!response.getToken().equals(null)) {
+                        // store the subscribed topics as a string in shared preferences
+                        PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.AUTH_TOKEN, response.getToken());
+                        PreferenceHelper.getSharedPreferenceEditor().commit();
+                        Log.d("STTGeneralRoutines", response.getToken());
+                    } else {
+                        // TODO try another time or go back to home screen
+                        Log.d(getClass().getCanonicalName(), "response - login credentials might be wrong: 401 unauthorized");
+                    }
                 /*
                 if(response.getStatus() == 200) {
                     // store the subscribed topics as a string in shared preferences
@@ -629,6 +634,10 @@ public class CommunicationManager {
                     Log.d(getClass().getCanonicalName(), "response - some error occured");
                 }
                 */
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -728,11 +737,12 @@ public class CommunicationManager {
         return new Response.Listener<STTResponse>() {
             @Override
             public void onResponse(STTResponse response) {
-                try {
+                try{
                     Log.d("STTGeneralRoutines", "SUBSCRIBED - " + response.getStatus());
                     if (callBack)
                         sttSuccessListener.Response(response);
-                }catch (Exception e){
+                }
+                catch (Exception e){
                     e.printStackTrace();
                 }
             }
@@ -795,11 +805,16 @@ public class CommunicationManager {
         return new Response.Listener<STTResponse>() {
             @Override
             public void onResponse(STTResponse response) {
-                Log.d("STTGeneralRoutines", "UNSUBSCRIBED - " + response.getStatus());
-                STTProviderHelper ph = new STTProviderHelper();
-                ph.updateTopicSubscribe(topicName, 0);
-                STTarterManager.getInstance().unsubscribe(topicName);
-                sttSuccessListener.Response(response);
+                try{
+                    Log.d("STTGeneralRoutines", "UNSUBSCRIBED - " + response.getStatus());
+                    STTProviderHelper ph = new STTProviderHelper();
+                    ph.updateTopicSubscribe(topicName, 0);
+                    STTarterManager.getInstance().unsubscribe(topicName);
+                    sttSuccessListener.Response(response);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -811,9 +826,27 @@ public class CommunicationManager {
 
     protected Map<String, String>  getHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_TOKEN,""));
-        headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(STTKeys.AUTH_TOKEN,""));
+        try {
+            headers.put("x-user-token", PreferenceHelper.getSharedPreference().getString(STTKeys.USER_TOKEN, ""));
+            headers.put("x-app-token", PreferenceHelper.getSharedPreference().getString(STTKeys.AUTH_TOKEN, ""));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         return headers;
+    }
+
+    // Get a MemoryInfo object for the device's current memory status.
+    public ActivityManager.MemoryInfo getAvailableMemory() {
+        ActivityManager activityManager = null;
+        try {
+            activityManager = (ActivityManager) STTarterManager.getInstance().getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        } catch (STTarterManager.ContextNotInitializedException e) {
+            e.printStackTrace();
+        }
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
     }
 
 }

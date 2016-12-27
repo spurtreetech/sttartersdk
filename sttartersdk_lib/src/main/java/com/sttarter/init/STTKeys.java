@@ -57,6 +57,8 @@ public class STTKeys {
     public static String CHANGE_REFERRAL_CODE = HOST + "referral/changereferralcode";
     public static String TRACK_REFERRAL_USAGE = HOST + "referral/trackusage";
 
+    public static String COUPON_REDEEM = HOST + "coupons/couponredeem";
+
     /* chat server url */
     public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";
     public static String PORT = "1883";
