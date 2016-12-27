@@ -51,7 +51,7 @@ public class STTGeneralRoutines {
         //STTarter.getInstance().unsubscribe(topics);
         ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
 
-        if (!memoryInfo.lowMemory) {
+        if (!memoryInfo.lowMemory || !STTarter.getInstance().isApplicationInBackground()) {
 
         Date dateTimeNow = Calendar.getInstance().getTime();
         long unixTime = dateTimeNow.getTime() / 1000L;
