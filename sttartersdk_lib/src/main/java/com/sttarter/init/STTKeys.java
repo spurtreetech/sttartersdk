@@ -91,4 +91,6 @@ public class STTKeys {
     public static String BUZZ_TOPIC = "buzz_topic";
     public static String CHECK_DIFF = "check_diff";
 
+    public static String HELP_DESK = BASE_URL + "helpdesk";
+
 }

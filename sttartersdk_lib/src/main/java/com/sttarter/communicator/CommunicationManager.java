@@ -455,6 +455,71 @@ public class CommunicationManager {
         };
     }
 
+    public void createHelpDesk(String helpDeskName,String users,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("query_id",helpDeskName);
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", helpDeskName);
+            jsonObject.put("type", "group");
+            jsonObject.put("allow_reply", true);
+            jsonObject.put("createdBy", STTarterManager.getInstance().getUsername());
+            params.put("meta",jsonObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        params.put("is_public","true");
+
+        Iterator it = params.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry pairs = (Map.Entry)it.next();
+            Log.d(this.getClass().getCanonicalName(), "params - " + pairs.getKey() + ", " + pairs.getValue());
+        }
+
+        String url = STTKeys.HELP_DESK + "/" ;//+ PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
+
+        GsonRequest<STTResponse> myReq = new GsonRequest<STTResponse>(
+                url,
+                STTResponse.class,
+                getHeaders(),
+                createHelpDeskSuccessListener(sttSuccessListener,getErrorListener),
+                getErrorListener,
+                Request.Method.POST, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+
+    }
+
+    private Response.Listener<STTResponse> createHelpDeskSuccessListener(final STTSuccessListener sttSuccessListener, final Response.ErrorListener getErrorListener) {
+
+        return new Response.Listener<STTResponse>() {
+            @Override
+            public void onResponse(final STTResponse response) {
+
+                try {
+                    getMyTopics();
+                    sttSuccessListener.Response(response);
+                } catch (SQLiteConstraintException e) {
+                    e.printStackTrace();
+                }
+
+                // store the subscribed topics as a string in shared preferences
+                //if(PreferenceHelper.getSharedPreference().getString(STTKeys.SUBSCRIBED_TOPICS,"").equals("")) {
+                /*PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.ALL_TOPICS_LIST, subscribedTopics);
+                PreferenceHelper.getSharedPreferenceEditor().commit();*/
+                //}
+
+                //getMyTopics();
+            }
+        };
+    }
+
 
     public void registerApp(String app_key,String username,String client, String manifacturer,String imei,String os,String gcmRegId) {
 
