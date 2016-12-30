@@ -192,6 +192,28 @@ public class STTarterManager {
 
     }
 
+    public void loginwithCustomAuth(Context context, String externalUserId, STTSuccessListener STTSuccessListener, Response.ErrorListener getLoginResponseListener) {
+        String url = STTKeys.LOGIN;
+        Log.d(TAG, "Login url - " + url);
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("externalUserId", externalUserId);
+
+        GsonRequest<User> myReq = new GsonRequest<User>(
+                url,
+                User.class,
+                getHeaders(),
+                getLoginSuccessListener(context, STTSuccessListener),
+                getLoginResponseListener,
+                Request.Method.POST, params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
     public void loginwithAccount(Context context, String username, String password, STTSuccessListener STTSuccessListener, Response.ErrorListener getLoginResponseListener) {
         String url = STTKeys.LOGIN;
         Log.d(TAG, "Login url - " + url);
@@ -214,8 +236,6 @@ public class STTarterManager {
 
         RequestQueueHelper.addToRequestQueue(myReq, "");
     }
-
-
 
     private Response.Listener<User> getLoginSuccessListener(final Context applicationContext, final STTSuccessListener STTSuccessListener) {
 
