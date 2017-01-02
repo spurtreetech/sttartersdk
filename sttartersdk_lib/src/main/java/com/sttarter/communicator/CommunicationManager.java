@@ -455,7 +455,7 @@ public class CommunicationManager {
         };
     }
 
-    public void createHelpDesk(String helpDeskName,String users,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
+    public void createHelpDesk(String helpDeskName,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("query_id",helpDeskName);
@@ -484,7 +484,7 @@ public class CommunicationManager {
                 url,
                 STTResponse.class,
                 getHeaders(),
-                createHelpDeskSuccessListener(sttSuccessListener,getErrorListener),
+                createHelpDeskSuccessListener(sttSuccessListener),
                 getErrorListener,
                 Request.Method.POST, params);
 
@@ -496,7 +496,7 @@ public class CommunicationManager {
 
     }
 
-    private Response.Listener<STTResponse> createHelpDeskSuccessListener(final STTSuccessListener sttSuccessListener, final Response.ErrorListener getErrorListener) {
+    private Response.Listener<STTResponse> createHelpDeskSuccessListener(final STTSuccessListener sttSuccessListener) {
 
         return new Response.Listener<STTResponse>() {
             @Override
