@@ -455,21 +455,11 @@ public class CommunicationManager {
         };
     }
 
-    public void createHelpDesk(String helpDeskName,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
+    public void createHelpDesk(String helpDeskName,String meta,STTSuccessListener sttSuccessListener, Response.ErrorListener getErrorListener) {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("query_id",helpDeskName);
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("name", helpDeskName);
-            jsonObject.put("type", "group");
-            jsonObject.put("allow_reply", true);
-            jsonObject.put("createdBy", STTarterManager.getInstance().getUsername());
-            params.put("meta",jsonObject.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        params.put("meta",meta);
         params.put("is_public","true");
 
         Iterator it = params.entrySet().iterator();

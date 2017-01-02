@@ -714,7 +714,7 @@ public class STTarterManager {
         }
 
         /** client handle is Uri(host+port) + clientId **/
-        this.clientId = getAppId() + deviceId;
+        this.clientId = PreferenceHelper.getSharedPreference().getString(STTKeys.APP_KEY,"") + deviceId;
         return this.clientId;
     }
 
