@@ -20,7 +20,8 @@ public class STTKeys {
     public static String STTARTER_APP_KEY = "sttarter_app_key";
     public static String STTARTER_APP_SECRET = "sttarter_secret";
 
-    private static String BASE_HOST = "http://10.1.3.174";//"http://sttarter.com";
+    public static String SERVER_URL = "10.1.3.174";  //"10.1.3.54";
+    private static String BASE_HOST = "http://"+SERVER_URL;//"http://sttarter.com";
     public static String USERDEFINED_BASE_HOST = "userbaseurl";
 
     private static String HOST = BASE_HOST+":9000/";  //"http://10.1.3.194:3000/"  //http://10.1.3.33:3000/  // http://sttarter.com/
@@ -60,7 +61,7 @@ public class STTKeys {
     public static String COUPON_REDEEM = HOST + "coupons/couponredeem";
 
     /* chat server url */
-    public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";
+
     public static String PORT = "1883";
     public static boolean CLEAN_SESSION = false;
     public static String NOTIFICATION_TOPICS = "NOTIFICATION_TOPICS";
