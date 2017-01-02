@@ -20,7 +20,7 @@ public class STTKeys {
     public static String STTARTER_APP_KEY = "sttarter_app_key";
     public static String STTARTER_APP_SECRET = "sttarter_secret";
 
-    public static String SERVER_URL = "10.1.3.174";  //"10.1.3.54";
+    public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";
     private static String BASE_HOST = "http://"+SERVER_URL;//"http://sttarter.com";
     public static String USERDEFINED_BASE_HOST = "userbaseurl";
 
