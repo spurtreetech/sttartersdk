@@ -61,7 +61,7 @@ public class STTKeys {
     public static String COUPON_REDEEM = HOST + "coupons/couponredeem";
 
     /* chat server url */
-    public static String PORT = "1883";
+    public static String PORT = "1884";
     public static boolean CLEAN_SESSION = false;
     public static String NOTIFICATION_TOPICS = "NOTIFICATION_TOPICS";
 

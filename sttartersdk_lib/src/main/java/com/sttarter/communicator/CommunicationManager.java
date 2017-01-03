@@ -100,7 +100,7 @@ public class CommunicationManager {
         }
     }
 
-    protected void getMyTopics() {
+    protected void getMyTopics(STTSuccessListener sttSuccessListener, STTResponse response) {
 
         Map<String, String> params = new HashMap<String, String>();
 
@@ -118,7 +118,7 @@ public class CommunicationManager {
                 url,
                 MyTopicsInfo.class,
                 getHeaders(),
-                getMyTopicsSuccessListener(),
+                getMyTopicsSuccessListener(sttSuccessListener,response),
                 RequestQueueHelper.responseErrorListener(),
                 Request.Method.GET, params);
 
@@ -130,7 +130,7 @@ public class CommunicationManager {
 
     }
 
-    private Response.Listener<MyTopicsInfo> getMyTopicsSuccessListener() {
+    private Response.Listener<MyTopicsInfo> getMyTopicsSuccessListener(final STTSuccessListener sttSuccessListener, final STTResponse sttResponse) {
 
         return new Response.Listener<MyTopicsInfo>() {
             @Override
@@ -199,6 +199,11 @@ public class CommunicationManager {
                     PreferenceHelper.getSharedPreferenceEditor().commit();
                     //}
                     getAllUsers();
+
+                    if (sttSuccessListener!=null){
+                        sttSuccessListener.Response(sttResponse);
+                    }
+
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -292,7 +297,7 @@ public class CommunicationManager {
                     PreferenceHelper.getSharedPreferenceEditor().commit();
                     //}
 
-                    getMyTopics();
+                    getMyTopics(null,null);
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -440,8 +445,8 @@ public class CommunicationManager {
                     e.printStackTrace();
                 }
                 finally {
-                    getMyTopics();
-                    sttSuccessListener.Response(response);
+                    getMyTopics(sttSuccessListener,response);
+                    //sttSuccessListener.Response(response);
                 }
 
                 // store the subscribed topics as a string in shared preferences
@@ -493,8 +498,8 @@ public class CommunicationManager {
             public void onResponse(final STTResponse response) {
 
                 try {
-                    getMyTopics();
-                    sttSuccessListener.Response(response);
+                    getMyTopics(sttSuccessListener,response);
+                    //sttSuccessListener.Response(response);
                 } catch (SQLiteConstraintException e) {
                     e.printStackTrace();
                 }
