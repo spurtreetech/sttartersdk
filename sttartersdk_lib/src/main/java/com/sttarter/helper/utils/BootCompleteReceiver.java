@@ -17,26 +17,30 @@ import org.eclipse.paho.android.service.MqttService;
 public class BootCompleteReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        Log.d("BootCompletedReceiver", "Online, restart service.");
-
-        // TODO STTarterManager start service
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm
-                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
-        wl.acquire();
-        if (isOnline(context)) {
+        try{
             Log.d("BootCompletedReceiver", "Online, restart service.");
 
-            // This is the Intent to deliver to our service.
-            Intent service = new Intent(context, MqttService.class);
+            // TODO STTarterManager start service
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wl = pm
+                    .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
+            wl.acquire();
+            if (isOnline(context)) {
+                Log.d("BootCompletedReceiver", "Online, restart service.");
 
-            // Start the service, keeping the device awake while it is launching.
-            Log.i("BootCompletedReceiver", "Starting service - @ " + SystemClock.elapsedRealtime());
-            context.startService(service);
-            //startWakefulService(context, service);
+                // This is the Intent to deliver to our service.
+                Intent service = new Intent(context, MqttService.class);
+
+                // Start the service, keeping the device awake while it is launching.
+                Log.i("BootCompletedReceiver", "Starting service - @ " + SystemClock.elapsedRealtime());
+                context.startService(service);
+                //startWakefulService(context, service);
+            }
+            wl.release();
         }
-        wl.release();
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public boolean isOnline(Context context) {

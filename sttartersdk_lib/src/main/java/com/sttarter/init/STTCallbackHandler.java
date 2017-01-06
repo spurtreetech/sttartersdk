@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.sttarter.R;
 import com.sttarter.common.models.PayloadData;
+import com.sttarter.communicator.CommunicationManager;
 import com.sttarter.communicator.models.GroupMeta;
 import com.sttarter.helper.utils.NotificationHelperListener;
 import com.sttarter.provider.STTProviderHelper;
@@ -160,10 +161,23 @@ public class STTCallbackHandler implements MqttCallback {
                 case "newgroupchat":
                     systemMessageType = "newgroupchat";
                     break;
+                case "topic-changed":
+                    systemMessageType = "topic-changed";
+                    break;
                 default:
                     break;
             }
-            broadCastHelper.sendSystemMessage(pd.getPayload().getMessage(), SysMessage.valueOf(systemMessageType), pd.getPayload().getTopic());
+
+            if (systemMessageType.equals("topic-changed")){
+                CommunicationManager.getInstance().subscribeInitalize();
+            }
+
+            if (pd.getPayload().getMessage()!=null)
+                broadCastHelper.sendSystemMessage(pd.getPayload().getMessage(), SysMessage.valueOf(systemMessageType), pd.getPayload().getTopic());
+            if (pd.getPayload().getMsg()!=null)
+                broadCastHelper.sendSystemMessage(pd.getPayload().getMsg(), SysMessage.valueOf(systemMessageType), pd.getPayload().getTopic());
+
+
 
         } else {Log.d(getClass().getSimpleName(), "Text Message received");
             // find the message, check if the  message is by sender, update if true or else insert it into the database is not already present by checking the hashcode
@@ -194,7 +208,7 @@ public class STTCallbackHandler implements MqttCallback {
 
                 Log.i(this.getClass().getSimpleName(), "Message not found and Message not by sender");
 
-                //if(STTarterManager.getInstance().isApplicationInBackground()) {
+                if(STTarterManager.getInstance().isApplicationInBackground()) {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, false);
@@ -218,12 +232,12 @@ public class STTCallbackHandler implements MqttCallback {
                         this.notificationHelperListener.displayNotification(notificationString);
                         //NotificationHelper.displayNotification(notificationString);
                     }
-                /*} else {
+                } else {
 
                     // insertMessage should have is_read field as false if application is in background
                     ph.insertMessage(pd, false, true);
                     ph.updateTopicActiveTime(pd);
-                }*/
+                }
             }
 
         }

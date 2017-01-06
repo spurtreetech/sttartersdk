@@ -72,112 +72,120 @@ public class ChatClient {
     }
 
     public static void sendMessage(String message, String topic) {
+        try{
+            PayloadData pd = new PayloadData();
+            pd.setType("message");
+            pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
+            pd.setFrom(PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
 
-        PayloadData pd = new PayloadData();
-        pd.setType("message");
-        pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
-        pd.setFrom(PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, ""));
+            Payload tempPayload = new Payload();
+            tempPayload.setTitle("message");
+            tempPayload.setMessage(message);
+            tempPayload.setTopic(topic);
+            pd.setPayload(tempPayload);
 
-        Payload tempPayload = new Payload();
-        tempPayload.setTitle("message");
-        tempPayload.setMessage(message);
-        tempPayload.setTopic(topic);
-        pd.setPayload(tempPayload);
+            int qos = ActivityConstants.defaultQos;
 
-        int qos = ActivityConstants.defaultQos;
+            Gson gson = new Gson();
+            //gson.toJson(pd);
 
-        Gson gson = new Gson();
-        //gson.toJson(pd);
+            // insert all messages by sender in the db
+            STTProviderHelper ph = new STTProviderHelper();
+            ph.insertMessage(pd, true, false);
+            ph.updateTopicActiveTime(pd);
+            send(gson.toJson(pd), topic, "message", qos);
 
-        // insert all messages by sender in the db
-        STTProviderHelper ph = new STTProviderHelper();
-        ph.insertMessage(pd, true, false);
-        ph.updateTopicActiveTime(pd);
-        send(gson.toJson(pd), topic, "message", qos);
-
-        Log.d("ChatClient", "converted json - " + gson.toJson(pd));
+            Log.d("ChatClient", "converted json - " + gson.toJson(pd));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void sendSystemMessage(String topic, SysMessage messageType) {
+try {
+    String user = PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
+    PayloadData pd = new PayloadData();
+    pd.setType("system");
+    pd.setTimestamp("" + DateTimeHelper.getUnixTimeStamp());
+    pd.setFrom(user);
 
-        String user = PreferenceHelper.getSharedPreference().getString(STTKeys.USER_ID, "");
-        PayloadData pd = new PayloadData();
-        pd.setType("system");
-        pd.setTimestamp(""+DateTimeHelper.getUnixTimeStamp());
-        pd.setFrom(user);
+    Payload tempPayload = new Payload();
+    //tempPayload.setMessage(message);
+    //tempPayload.setTopic(topic);
+    //tempPayload.setTitle();
+    int qos = ActivityConstants.defaultQos;
+    switch (messageType) {
+        case user_typing:
+            tempPayload.setTitle(SysMessage.user_typing.toString());
+            tempPayload.setMessage(user + " is typing");
+            tempPayload.setTopic(topic);
+            qos = 0;
+            break;
+        case joinchat:
+            tempPayload.setTitle(SysMessage.joinchat.toString());
+            tempPayload.setMessage((user + " has joined chat"));
+            tempPayload.setTopic(topic);
+            qos = 0;
+            break;
+        case leftchat:
+            tempPayload.setTitle(SysMessage.leftchat.toString());
+            tempPayload.setMessage((user + " has left chat"));
+            tempPayload.setTopic(topic);
+            qos = 0;
+            break;
+        case online:
+            tempPayload.setTitle(SysMessage.online.toString());
+            tempPayload.setMessage((user + " is online"));
+            tempPayload.setTopic(topic);
+            qos = 0;
+            break;
+        case offline:
+            tempPayload.setTitle(SysMessage.offline.toString());
+            tempPayload.setMessage((user + " is offline"));
+            tempPayload.setTopic(topic);
+            qos = 0;
+            break;
+        case newtopic:
+            tempPayload.setTitle(SysMessage.newtopic.toString());
+            tempPayload.setTopic(topic);
+            tempPayload.setMessage((user + " has added you in " + topic));
+            qos = 0; //
+            break;
+        case topicdeleted:
+            tempPayload.setTitle(SysMessage.topicdeleted.toString());
+            tempPayload.setTopic(topic);
+            tempPayload.setMessage(("topic " + topic + " has been deleted"));
+            qos = 0; //
+            break;
+        case newchat:
+            tempPayload.setTitle(SysMessage.newchat.toString());
+            tempPayload.setTopic(topic);
+            tempPayload.setMessage((user + "wants to chat with you"));
+            qos = 0; //
+            break;
+        case newgroupchat:
+            tempPayload.setTitle(SysMessage.newgroupchat.toString());
+            tempPayload.setTopic(topic);
+            tempPayload.setGroup_name("group_name");
+            tempPayload.setMessage((user + " added you in group " + "group_name"));
+            qos = 0; //
+            break;
+        default:
+            break;
+    }
 
-        Payload tempPayload = new Payload();
-        //tempPayload.setMessage(message);
-        //tempPayload.setTopic(topic);
-        //tempPayload.setTitle();
-        int qos = ActivityConstants.defaultQos;
-        switch (messageType) {
-            case user_typing:
-                tempPayload.setTitle(SysMessage.user_typing.toString());
-                tempPayload.setMessage(user + " is typing");
-                tempPayload.setTopic(topic);
-                qos = 0;
-                break;
-            case joinchat:
-                tempPayload.setTitle(SysMessage.joinchat.toString());
-                tempPayload.setMessage((user + " has joined chat"));
-                tempPayload.setTopic(topic);
-                qos = 0;
-                break;
-            case leftchat:
-                tempPayload.setTitle(SysMessage.leftchat.toString());
-                tempPayload.setMessage((user + " has left chat"));
-                tempPayload.setTopic(topic);
-                qos = 0;
-                break;
-            case online:
-                tempPayload.setTitle(SysMessage.online.toString());
-                tempPayload.setMessage((user + " is online"));
-                tempPayload.setTopic(topic);
-                qos = 0;
-                break;
-            case offline:
-                tempPayload.setTitle(SysMessage.offline.toString());
-                tempPayload.setMessage((user + " is offline"));
-                tempPayload.setTopic(topic);
-                qos = 0;
-                break;
-            case newtopic:
-                tempPayload.setTitle(SysMessage.newtopic.toString());
-                tempPayload.setTopic(topic);
-                tempPayload.setMessage((user + " has added you in " + topic));
-                qos = 0; //
-                break;
-            case topicdeleted:
-                tempPayload.setTitle(SysMessage.topicdeleted.toString());
-                tempPayload.setTopic(topic);
-                tempPayload.setMessage(("topic " + topic + " has been deleted"));
-                qos = 0; //
-                break;
-            case newchat:
-                tempPayload.setTitle(SysMessage.newchat.toString());
-                tempPayload.setTopic(topic);
-                tempPayload.setMessage((user + "wants to chat with you"));
-                qos = 0; //
-                break;
-            case newgroupchat:
-                tempPayload.setTitle(SysMessage.newgroupchat.toString());
-                tempPayload.setTopic(topic);
-                tempPayload.setGroup_name("group_name");
-                tempPayload.setMessage((user + " added you in group " + "group_name"));
-                qos = 0; //
-                break;
-            default: break;
-        }
+    pd.setPayload(tempPayload);
 
-        pd.setPayload(tempPayload);
+    Gson gson = new Gson();
+    //gson.toJson(pd);
+    send(gson.toJson(pd), topic, "system", qos);
 
-        Gson gson = new Gson();
-        //gson.toJson(pd);
-        send(gson.toJson(pd),topic, "system", qos);
-
-        Log.d("ChatClient", "converted json - " + gson.toJson(pd));
-
+    Log.d("ChatClient", "converted json - " + gson.toJson(pd));
+}
+catch (Exception e){
+    e.printStackTrace();
+}
     }
 }
 

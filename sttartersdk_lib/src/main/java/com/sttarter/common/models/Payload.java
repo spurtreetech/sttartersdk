@@ -4,7 +4,7 @@ package com.sttarter.common.models;
  * Created by RahulT on 20-07-2015.
  */
 public class Payload {
-    String title, topic, group_name, message;
+    String title, topic, group_name, message,msg;
 
     public String getTitle() {
         return title;
@@ -36,5 +36,13 @@ public class Payload {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 }

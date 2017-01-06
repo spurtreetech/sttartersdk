@@ -14,7 +14,25 @@ public class GroupMeta {
     String share_contacts;
     String username;
     String mobile;
+    String createdBy;
+    String subject;
     String avatar;
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public String getAvatar() {
         return avatar;
@@ -39,7 +57,6 @@ public class GroupMeta {
     public void setMobile(String mobile) {
         this.mobile = mobile;
     }
-
 
 
     public String getImage() {
