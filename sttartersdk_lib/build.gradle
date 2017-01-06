@@ -18,9 +18,6 @@ android {
         debug {
         }
     }
-    lintOptions {
-        abortOnError false
-    }
 }
 
 repositories{
@@ -30,7 +27,7 @@ repositories{
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     //compile files('libs/org.eclipse.paho.android.service-1.0.2.jar')
     //compile files('libs/org.eclipse.paho.client.mqttv3-1.0.2.jar')
     compile files('libs/org.eclipse.paho.client.mqttv3-1.1.0.jar')
@@ -44,4 +41,5 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:1.3.0'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.jakewharton:disklrucache:2.0.2'
+    compile files('libs/okhttp-1.6.0.jar')
 }

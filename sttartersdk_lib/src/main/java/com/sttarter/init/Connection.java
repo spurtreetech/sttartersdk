@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * 
+ *
  * Represents a {@link MqttAndroidClient} and the actions it has performed
  *
  */
@@ -99,20 +99,24 @@ public class Connection {
    * @return a new instance of <code>Connection</code>
    */
   public static Connection createConnection(String clientId, String host,
-      int port, Context context, boolean sslConnection) {
-    String handle = null;
-    String uri = null;
-    if (sslConnection) {
-      uri = "ssl://" + host + ":" + port;
-      handle = uri + clientId;
+                                            int port, Context context, boolean sslConnection) {
+    try {
+      String handle = null;
+      String uri = null;
+      if (sslConnection) {
+        uri = "ssl://" + host + ":" + port;
+        handle = uri + clientId;
+      } else {
+        uri = "tcp://" + host + ":" + port;
+        handle = uri + clientId;
+      }
+      MqttAndroidClient client = new MqttAndroidClient(context, uri, clientId);
+      return new Connection(handle, clientId, host, port, context, client, sslConnection);
     }
-    else {
-      uri = "tcp://" + host + ":" + port;
-      handle = uri + clientId;
+    catch (Exception e){
+      e.printStackTrace();
     }
-    MqttAndroidClient client = new MqttAndroidClient(context, uri, clientId);
-    return new Connection(handle, clientId, host, port, context, client, sslConnection);
-
+    return null;
   }
 
   /**
@@ -127,21 +131,26 @@ public class Connection {
    * @param sslConnection true if the connection is secured by SSL
    */
   public Connection(String clientHandle, String clientId, String host,
-      int port, Context context, MqttAndroidClient client, boolean sslConnection) {
+                    int port, Context context, MqttAndroidClient client, boolean sslConnection) {
     //generate the client handle from its hash code
-    this.clientHandle = clientHandle;
-    this.clientId = clientId;
-    this.host = host;
-    this.port = port;
-    this.context = context;
-    this.client = client;
-    this.sslConnection = sslConnection;
-    history = new ArrayList<String>();
-    StringBuffer sb = new StringBuffer();
-    sb.append("Client: ");
-    sb.append(clientId);
-    sb.append(" created");
-    addAction(sb.toString());
+    try {
+      this.clientHandle = clientHandle;
+      this.clientId = clientId;
+      this.host = host;
+      this.port = port;
+      this.context = context;
+      this.client = client;
+      this.sslConnection = sslConnection;
+      history = new ArrayList<String>();
+      StringBuffer sb = new StringBuffer();
+      sb.append("Client: ");
+      sb.append(clientId);
+      sb.append(" created");
+      addAction(sb.toString());
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -149,21 +158,26 @@ public class Connection {
    * @param action the history item to add
    */
   public void addAction(String action) {
+    try {
 
-    Object[] args = new String[1];
-    SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.dateFormat));
-    args[0] = sdf.format(new Date());
+      Object[] args = new String[1];
+      SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.dateFormat));
+      args[0] = sdf.format(new Date());
 
-    String timestamp = context.getString(R.string.timestamp, args);
-    history.add(action + timestamp);
+      String timestamp = context.getString(R.string.timestamp, args);
+      history.add(action + timestamp);
 
-    notifyListeners(new PropertyChangeEvent(this, ActivityConstants.historyProperty, null, action));
+      notifyListeners(new PropertyChangeEvent(this, ActivityConstants.historyProperty, null, action));
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   /**
    * Generate an array of Spanned items representing the history of this
    * connection. 
-   * 
+   *
    * @return an array of history entries
    */
   public Spanned[] history() {
@@ -211,8 +225,8 @@ public class Connection {
   /**
    * A string representing the state of the client this connection
    * object represents
-   * 
-   * 
+   *
+   *
    * @return A string representing the state of the client
    */
   @Override
@@ -355,7 +369,7 @@ public class Connection {
 
   /**
    * Notify {@link PropertyChangeListener} objects that the object has been updated
-   * @param propertyChangeEvent 
+   * @param propertyChangeEvent
    */
   private void notifyListeners(PropertyChangeEvent propertyChangeEvent)
   {

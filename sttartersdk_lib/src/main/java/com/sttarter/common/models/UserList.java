@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by rahul on 05/08/15.
  */
-public class UserList extends STTResponse {
+public class UserList extends STTResponse{
 
     ArrayList<User> users;
 

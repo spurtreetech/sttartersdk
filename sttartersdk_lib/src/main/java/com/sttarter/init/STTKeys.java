@@ -20,7 +20,8 @@ public class STTKeys {
     public static String STTARTER_APP_KEY = "sttarter_app_key";
     public static String STTARTER_APP_SECRET = "sttarter_secret";
 
-    private static String BASE_HOST = "http://sttarter.com";
+    public static String SERVER_URL = "sttarter.com";  //"10.1.3.174";
+    private static String BASE_HOST = "http://"+SERVER_URL;//"http://sttarter.com";
     public static String USERDEFINED_BASE_HOST = "userbaseurl";
 
     private static String HOST = BASE_HOST+":9000/";  //"http://10.1.3.194:3000/"  //http://10.1.3.33:3000/  // http://sttarter.com/
@@ -28,6 +29,9 @@ public class STTKeys {
 
     public static String AUTH = HOST + "auth";
     public static String LOGIN = HOST + "login";
+    public static String GET_OTP = HOST + "/mobile/getotp";
+    public static String OTP_LOGIN = HOST + "/mobile/otplogin";
+    public static String QUICK_LOGIN = HOST + "/mobile/quicklogin";
     public static String INIT = HOST + "init";
     public static String SIGNUP = HOST + "app/user";
     public static String GET_TOPICS = BASE_URL + "gettopics";
@@ -36,8 +40,9 @@ public class STTKeys {
     public static String REGISTER = HOST + "app/client/register";
     public static String UNREGISTER = HOST + "app/client/unregister";
     public static String MY_TOPICS = BASE_URL + "mytopics";
-    public static String SUB = BASE_URL + "topic/join";
-    public static String UNSUB = BASE_URL + "topic/leave";
+    public static String GROUP = BASE_URL + "group";
+    public static String SUB = BASE_URL + "group/join";
+    public static String UNSUB = BASE_URL + "group/leave";
     public static String PUBLISH = BASE_URL + "pub";
     public static String INITCHAT = BASE_URL + "initchat";
     public static String INITGROUPCHAT = BASE_URL + "initgroupchat";
@@ -53,9 +58,10 @@ public class STTKeys {
     public static String CHANGE_REFERRAL_CODE = HOST + "referral/changereferralcode";
     public static String TRACK_REFERRAL_USAGE = HOST + "referral/trackusage";
 
+    public static String COUPON_REDEEM = HOST + "coupons/couponredeem";
+
     /* chat server url */
-    public static String SERVER_URL = "sttarter.com";  //"10.1.3.54";
-    public static String PORT = "1883";
+    public static String PORT = "1884";
     public static boolean CLEAN_SESSION = false;
     public static String NOTIFICATION_TOPICS = "NOTIFICATION_TOPICS";
 
@@ -83,6 +89,8 @@ public class STTKeys {
     public static int PERFECT_RESPONSE = 555;
 
     public static String BUZZ_TOPIC = "buzz_topic";
+    public static String CHECK_DIFF = "check_diff";
 
+    public static String HELP_DESK = BASE_URL + "helpdesk";
 
 }
