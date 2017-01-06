@@ -18,8 +18,10 @@ import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.sttarter.common.models.PayloadData;
 import com.sttarter.common.utils.CustomHurlStack;
 import com.sttarter.common.utils.OkHttpHurlStack;
+import com.sttarter.communicator.models.GroupMeta;
 import com.sttarter.helper.interfaces.STTSuccessListener;
 import com.sttarter.init.Connections;
 import com.sttarter.common.utils.GsonRequest;
@@ -35,6 +37,9 @@ import com.sttarter.communicator.models.MyTopicsInfo;
 import com.sttarter.communicator.models.SubscribeInfo;
 import com.sttarter.communicator.models.Group;
 import com.sttarter.provider.STTProviderHelper;
+import com.sttarter.provider.messages.MessagesCursor;
+import com.sttarter.provider.topics.TopicsCursor;
+import com.sttarter.unknown.BuzzArrayListModel;
 
 import org.json.JSONObject;
 
@@ -46,6 +51,7 @@ import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Created by Shahbaz on 14-11-2016.
@@ -84,7 +90,7 @@ public class CommunicationManager {
                 // TODO get all topics from server and subscribe to all of them
                 Date dateTimeNow = Calendar.getInstance().getTime();
                 long unixTime = dateTimeNow.getTime() / 1000L;
-                long MAX_DURATION = MILLISECONDS.convert(2, MINUTES);
+                long MAX_DURATION = MILLISECONDS.convert(15, SECONDS);
                 Date time = new Date(PreferenceHelper.getSharedPreference().getLong(STTKeys.CHECK_DIFF, 0) * 1000);
 
                 long duration = dateTimeNow.getTime() - time.getTime();
@@ -98,6 +104,10 @@ public class CommunicationManager {
                 }
             }
         }
+    }
+
+    public void refreshTopics(){
+        getMyTopics(null,null);
     }
 
     protected void getMyTopics(STTSuccessListener sttSuccessListener, STTResponse response) {
@@ -378,6 +388,104 @@ public class CommunicationManager {
                 }
             }
         };
+    }
+
+
+    public void getMessages(String group, Response.Listener<BuzzArrayListModel> getBuzzResponseListener, Response.ErrorListener getBuzzErrorResponseListener, Context applicationContext) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        /*params.put("email", email.getEmail());
+        params.put("subject", email.getSubject());
+        params.put("message", email.getMessage());*/
+
+        String url = STTKeys.BUZZ_MESSAGES+"/"+group+"/20/0";
+        Log.d(TAG, "Buzz url - " + url);
+
+        GsonRequest<BuzzArrayListModel> myReq = new GsonRequest<BuzzArrayListModel>(
+                url,
+                BuzzArrayListModel.class,
+                getHeaders(),
+                getMessagesResponseListener(),
+                getBuzzErrorResponseListener,
+                Request.Method.GET,params);
+
+        int socketTimeout = 30000;//or (30000)30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(2*socketTimeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        myReq.setRetryPolicy(policy);
+
+        RequestQueueHelper.addToRequestQueue(myReq, "");
+    }
+
+    private Response.Listener<BuzzArrayListModel> getMessagesResponseListener() {
+
+        return new Response.Listener<BuzzArrayListModel>() {
+            @Override
+            public void onResponse(BuzzArrayListModel response) {
+
+                /*Gson gson = new Gson();
+
+                STTProviderHelper ph = new STTProviderHelper();
+                PayloadData pd = gson.fromJson(new String(message.getPayload()), PayloadData.class);
+                MessagesCursor messageCursor = ph.findMessage(pd.getPayload().getMessage()==null?"":pd.getPayload().getMessage(), pd.getPayload().getTopic(), Long.parseLong(pd.getTimestamp()));
+                //Log.d(getClass().getSimpleName(), "cursor count : " + isMessagePresentCursor.getCount());
+                if(messageCursor != null && messageCursor.getCount() > 0) {
+                    messageCursor.moveToFirst();
+                    //isMessagePresentCursor.close();
+                    //isMessagePresentCursor.moveToFirst();
+                    Log.i(this.getClass().getSimpleName(), "Message found: " + messageCursor.getMessageText());
+                    //Cursor isMsgBySndrCursor = ph.isMessageBySender(pd.getPayload().getMessage(), pd.getPayload().getTopic(), pd.getTimestamp());
+                    //Log.d(getClass().getSimpleName(), "Cursor count (isMsgBySender) - " + messageCursor.getCount());
+                    if(messageCursor.getIsSender()) {
+                        //isMsgBySndrCursor.close();
+                        //isMsgBySndrCursor.moveToFirst();
+                        // message is present and was by the sender so update its status as received
+                        Log.i(this.getClass().getSimpleName(), "Message by sender");
+                        // update the message as received status
+                        if(!messageCursor.getIsDelivered())
+                            ph.updateMessageSentStatus(pd);
+                    } else {
+                        Log.i(this.getClass().getSimpleName(), "Message not by sender");
+                        // TODO update the
+                        //ph.insertMessage(pd.getPayload().getMessage(), pd.getPayload().getTopic(), false, true, pd.getTimestamp());
+                    }
+                } else {
+
+                    Log.i(this.getClass().getSimpleName(), "Message not found and Message not by sender");
+
+                    if(STTarterManager.getInstance().isApplicationInBackground()) {
+
+                        // insertMessage should have is_read field as false if application is in background
+                        ph.insertMessage(pd, false, false);
+                        ph.updateTopicActiveTime(pd);
+
+                        String notificationString = PreferenceHelper.getSharedPreference().getString(STTKeys.NOTIFICATION_TOPICS,"");
+                        TopicsCursor tc = ph.getTopicData(pd.getPayload().getTopic());
+
+                        if(tc.getCount()!=0) {
+
+                            tc.moveToFirst();
+                            tm = gson.fromJson(tc.getTopicMeta(), GroupMeta.class);
+
+                            if(notificationString.equals("")) {
+                                notificationString = (tm==null || tm.getName()==null || tm.getName().equals("")) ? "Buzz" : tm.getName();
+                            } else {
+                                notificationString += ", " + ((tm==null || tm.getName()==null || tm.getName().equals("")) ? "Buzz" : tm.getName());
+                            }
+
+                            PreferenceHelper.getSharedPreferenceEditor().putString(STTKeys.NOTIFICATION_TOPICS, notificationString).commit();
+                            this.notificationHelperListener.displayNotification(notificationString);
+                            //NotificationHelper.displayNotification(notificationString);
+                        }
+                    } else {
+
+                        // insertMessage should have is_read field as false if application is in background
+                        ph.insertMessage(pd, false, true);
+                        ph.updateTopicActiveTime(pd);
+                    }
+                }*/
+            }
+        };
+
     }
 
 
