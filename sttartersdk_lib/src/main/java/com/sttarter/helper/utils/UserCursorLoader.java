@@ -38,7 +38,7 @@ public class UserCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         UsersSelection where = new UsersSelection();
         switch (id) {
             case 0:
-                where.usersNameLike(userString);
+                where.usersNameStartsWith(userString);
                 //uri = Uri.parse("content://" + STTContentProvider.AUTHORITY + "/" + DatabaseHelper.TABLE_MESSAGES + "/singleTopicMessages");
                 //selection = DatabaseHelper.COLUMN_MESSAGE_TOPIC + " LIKE '%" + topic + "%'";
                 Log.d("ChatActivity Loader", "CursorLoader initialized");

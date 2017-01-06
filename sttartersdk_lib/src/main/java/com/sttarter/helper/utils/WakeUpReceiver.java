@@ -16,18 +16,22 @@ import org.eclipse.paho.android.service.MqttService;
 public class WakeUpReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+            Log.d("WakeUpReceiver", "Reconnect on Device wakeup.");
 
-        Log.d("WakeUpReceiver","Reconnect on Device wakeup.");
+            if (isOnline(context)) {
+                Log.d("WakeUpReceiver", "Online, restart service.");
 
-        if (isOnline(context)) {
-            Log.d("WakeUpReceiver", "Online, restart service.");
+                // This is the Intent to deliver to our service.
+                Intent service = new Intent(context, MqttService.class);
 
-            // This is the Intent to deliver to our service.
-            Intent service = new Intent(context, MqttService.class);
-
-            // Start the service, keeping the device awake while it is launching.
-            Log.i("WakeUpReceiver", "Starting service - @ " + SystemClock.elapsedRealtime());
-            startWakefulService(context, service);
+                // Start the service, keeping the device awake while it is launching.
+                Log.i("WakeUpReceiver", "Starting service - @ " + SystemClock.elapsedRealtime());
+                startWakefulService(context, service);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
     }

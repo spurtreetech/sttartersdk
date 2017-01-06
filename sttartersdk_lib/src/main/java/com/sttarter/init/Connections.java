@@ -43,17 +43,21 @@ public class Connections {
    */
   private Connections(Context context)
   {
-    connections = new HashMap<String, Connection>();
-
-    //attempt to restore state
-    persistence = new Persistence(context);
     try {
-      List<Connection> l = persistence.restoreConnections(context);
-      for (Connection c : l) {
-        connections.put(c.handle(), c);
+      connections = new HashMap<String, Connection>();
+
+      //attempt to restore state
+      persistence = new Persistence(context);
+      try {
+        List<Connection> l = persistence.restoreConnections(context);
+        for (Connection c : l) {
+          connections.put(c.handle(), c);
+        }
+      } catch (PersistenceException e) {
+        e.printStackTrace();
       }
     }
-    catch (PersistenceException e) {
+    catch (Exception e){
       e.printStackTrace();
     }
 

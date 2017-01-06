@@ -84,25 +84,25 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
   /** Create tables query **/
   private static final String SQL_CREATE_ENTRIES =
 
-      "CREATE TABLE " + TABLE_CONNECTIONS + " (" +
-          _ID + " INTEGER PRIMARY KEY," +
-          COLUMN_HOST + TEXT_TYPE + COMMA_SEP +
-          COLUMN_client_ID + TEXT_TYPE + COMMA_SEP +
-          COLUMN_port + INT_TYPE + COMMA_SEP +
-          COLUMN_ssl + INT_TYPE + COMMA_SEP +
-          COLUMN_TIME_OUT + INT_TYPE + COMMA_SEP +
-          COLUMN_KEEP_ALIVE + INT_TYPE + COMMA_SEP +
-          COLUMN_USER_NAME + TEXT_TYPE + COMMA_SEP +
-          COLUMN_PASSWORD + TEXT_TYPE + COMMA_SEP +
-          COLUMN_CLEAN_SESSION + INT_TYPE + COMMA_SEP +
-          COLUMN_TOPIC + TEXT_TYPE + COMMA_SEP +
-          COLUMN_MESSAGE + TEXT_TYPE + COMMA_SEP +
-          COLUMN_QOS + INT_TYPE + COMMA_SEP +
-          COLUMN_RETAINED + " INTEGER);";
+          "CREATE TABLE " + TABLE_CONNECTIONS + " (" +
+                  _ID + " INTEGER PRIMARY KEY," +
+                  COLUMN_HOST + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_client_ID + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_port + INT_TYPE + COMMA_SEP +
+                  COLUMN_ssl + INT_TYPE + COMMA_SEP +
+                  COLUMN_TIME_OUT + INT_TYPE + COMMA_SEP +
+                  COLUMN_KEEP_ALIVE + INT_TYPE + COMMA_SEP +
+                  COLUMN_USER_NAME + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_PASSWORD + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_CLEAN_SESSION + INT_TYPE + COMMA_SEP +
+                  COLUMN_TOPIC + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_MESSAGE + TEXT_TYPE + COMMA_SEP +
+                  COLUMN_QOS + INT_TYPE + COMMA_SEP +
+                  COLUMN_RETAINED + " INTEGER);";
 
   /** Delete tables entry **/
   private static final String SQL_DELETE_ENTRIES =
-      "DROP TABLE IF EXISTS " + TABLE_CONNECTIONS;
+          "DROP TABLE IF EXISTS " + TABLE_CONNECTIONS;
 
   /**
    * Creates the persistence object passing it a context
@@ -197,86 +197,92 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
    */
   public List<Connection> restoreConnections(Context context) throws PersistenceException
   {
-    //columns to return
-    String[] connectionColumns = {
-        COLUMN_HOST,
-        COLUMN_port,
-        COLUMN_client_ID,
-        COLUMN_ssl,
-        COLUMN_KEEP_ALIVE,
-        COLUMN_CLEAN_SESSION,
-        COLUMN_TIME_OUT,
-        COLUMN_USER_NAME,
-        COLUMN_PASSWORD,
-        COLUMN_TOPIC,
-        COLUMN_MESSAGE,
-        COLUMN_RETAINED,
-        COLUMN_QOS,
-        _ID
+    try {
+      //columns to return
+      String[] connectionColumns = {
+              COLUMN_HOST,
+              COLUMN_port,
+              COLUMN_client_ID,
+              COLUMN_ssl,
+              COLUMN_KEEP_ALIVE,
+              COLUMN_CLEAN_SESSION,
+              COLUMN_TIME_OUT,
+              COLUMN_USER_NAME,
+              COLUMN_PASSWORD,
+              COLUMN_TOPIC,
+              COLUMN_MESSAGE,
+              COLUMN_RETAINED,
+              COLUMN_QOS,
+              _ID
 
-    };
+      };
 
-    //how to sort the data being returned
-    String sort = COLUMN_HOST;
+      //how to sort the data being returned
+      String sort = COLUMN_HOST;
 
-    SQLiteDatabase db = getReadableDatabase();
+      SQLiteDatabase db = getReadableDatabase();
 
-    Cursor c = db.query(TABLE_CONNECTIONS, connectionColumns, null, null, null, null, sort);
-    ArrayList<Connection> list = new ArrayList<Connection>(c.getCount());
-    Connection connection = null;
-    for (int i = 0; i < c.getCount(); i++) {
-      if (!c.moveToNext()) { //move to the next item throw persistence exception, if it fails
-        throw new PersistenceException("Failed restoring connection - count: " + c.getCount() + "loop iteration: " + i);
+      Cursor c = db.query(TABLE_CONNECTIONS, connectionColumns, null, null, null, null, sort);
+      ArrayList<Connection> list = new ArrayList<Connection>(c.getCount());
+      Connection connection = null;
+      for (int i = 0; i < c.getCount(); i++) {
+        if (!c.moveToNext()) { //move to the next item throw persistence exception, if it fails
+          throw new PersistenceException("Failed restoring connection - count: " + c.getCount() + "loop iteration: " + i);
+        }
+        //get data from cursor
+        Long id = c.getLong(c.getColumnIndexOrThrow(_ID));
+        //basic client information
+        String host = c.getString(c.getColumnIndexOrThrow(COLUMN_HOST));
+        String clientID = c.getString(c.getColumnIndexOrThrow(COLUMN_client_ID));
+        int port = c.getInt(c.getColumnIndexOrThrow(COLUMN_port));
+
+        //connect options strings
+        String username = c.getString(c.getColumnIndexOrThrow(COLUMN_USER_NAME));
+        String password = c.getString(c.getColumnIndexOrThrow(COLUMN_PASSWORD));
+        String topic = c.getString(c.getColumnIndexOrThrow(COLUMN_TOPIC));
+        String message = c.getString(c.getColumnIndexOrThrow(COLUMN_MESSAGE));
+
+        //connect options integers
+        int qos = c.getInt(c.getColumnIndexOrThrow(COLUMN_QOS));
+        int keepAlive = c.getInt(c.getColumnIndexOrThrow(COLUMN_KEEP_ALIVE));
+        int timeout = c.getInt(c.getColumnIndexOrThrow(COLUMN_TIME_OUT));
+
+        //get all values that need converting and convert integers to booleans in line using "condition ? trueValue : falseValue"
+        boolean cleanSession = c.getInt(c.getColumnIndexOrThrow(COLUMN_CLEAN_SESSION)) == 1 ? true : false;
+        boolean retained = c.getInt(c.getColumnIndexOrThrow(COLUMN_RETAINED)) == 1 ? true : false;
+        boolean ssl = c.getInt(c.getColumnIndexOrThrow(COLUMN_ssl)) == 1 ? true : false;
+
+        //rebuild objects starting with the connect options
+        MqttConnectOptions opts = new MqttConnectOptions();
+        opts.setCleanSession(cleanSession);
+        opts.setKeepAliveInterval(keepAlive);
+        opts.setConnectionTimeout(timeout);
+
+        opts.setPassword(password != null ? password.toCharArray() : null);
+        opts.setUserName(username);
+
+        if (topic != null) {
+          opts.setWill(topic, message.getBytes(), qos, retained);
+        }
+
+        //now create the connection object
+        connection = Connection.createConnection(clientID, host, port, context, ssl);
+        if (connection!=null) {
+          connection.addConnectionOptions(opts);
+          connection.assignPersistenceId(id);
+          //store it in the list
+          list.add(connection);
+        }
       }
-      //get data from cursor
-      Long id = c.getLong(c.getColumnIndexOrThrow(_ID));
-      //basic client information
-      String host = c.getString(c.getColumnIndexOrThrow(COLUMN_HOST));
-      String clientID = c.getString(c.getColumnIndexOrThrow(COLUMN_client_ID));
-      int port = c.getInt(c.getColumnIndexOrThrow(COLUMN_port));
-
-      //connect options strings
-      String username = c.getString(c.getColumnIndexOrThrow(COLUMN_USER_NAME));
-      String password = c.getString(c.getColumnIndexOrThrow(COLUMN_PASSWORD));
-      String topic = c.getString(c.getColumnIndexOrThrow(COLUMN_TOPIC));
-      String message = c.getString(c.getColumnIndexOrThrow(COLUMN_MESSAGE));
-
-      //connect options integers
-      int qos = c.getInt(c.getColumnIndexOrThrow(COLUMN_QOS));
-      int keepAlive = c.getInt(c.getColumnIndexOrThrow(COLUMN_KEEP_ALIVE));
-      int timeout = c.getInt(c.getColumnIndexOrThrow(COLUMN_TIME_OUT));
-
-      //get all values that need converting and convert integers to booleans in line using "condition ? trueValue : falseValue"
-      boolean cleanSession = c.getInt(c.getColumnIndexOrThrow(COLUMN_CLEAN_SESSION)) == 1 ? true : false;
-      boolean retained = c.getInt(c.getColumnIndexOrThrow(COLUMN_RETAINED)) == 1 ? true : false;
-      boolean ssl = c.getInt(c.getColumnIndexOrThrow(COLUMN_ssl)) == 1 ? true : false;
-
-      //rebuild objects starting with the connect options
-      MqttConnectOptions opts = new MqttConnectOptions();
-      opts.setCleanSession(cleanSession);
-      opts.setKeepAliveInterval(keepAlive);
-      opts.setConnectionTimeout(timeout);
-
-      opts.setPassword(password != null ? password.toCharArray() : null);
-      opts.setUserName(username);
-
-      if (topic != null) {
-        opts.setWill(topic, message.getBytes(), qos, retained);
-      }
-
-      //now create the connection object
-      connection = Connection.createConnection(clientID, host, port, context, ssl);
-      connection.addConnectionOptions(opts);
-      connection.assignPersistenceId(id);
-      //store it in the list
-      list.add(connection);
-
+      //close the cursor now we are finished with it
+      c.close();
+      db.close();
+      return list;
     }
-    //close the cursor now we are finished with it
-    c.close();
-    db.close();
-    return list;
-
+    catch (Exception e){
+      e.printStackTrace();
+      return new ArrayList<>();
+    }
   }
 
   /**
@@ -284,11 +290,15 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
    * @param connection The connection to delete from the database
    */
   public void deleteConnection(Connection connection) {
-    SQLiteDatabase db = getWritableDatabase();
+    try {
+      SQLiteDatabase db = getWritableDatabase();
 
-    db.delete(TABLE_CONNECTIONS, _ID + "=?", new String[]{String.valueOf(connection.persistenceId())});
-    db.close();
-    //don't care if it failed, means it's not in the db therefore no need to delete
-
+      db.delete(TABLE_CONNECTIONS, _ID + "=?", new String[]{String.valueOf(connection.persistenceId())});
+      db.close();
+      //don't care if it failed, means it's not in the db therefore no need to delete
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 }
